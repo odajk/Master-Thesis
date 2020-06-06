@@ -1,0 +1,86 @@
+\documentclass[a4paper, british]{memoir}
+
+\usepackage{style}           % Custom style
+\usepackage{masterfrontpage} % Front page
+\usepackage{kantlipsum}      % Dummy text
+%\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{bbold}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\algnewcommand{\algorithmicand}{\textbf{ and }}
+\algnewcommand{\algorithmicor}{\textbf{ or }}
+\algnewcommand{\OR}{\algorithmicor}
+\algnewcommand{\AND}{\algorithmicand}
+\usepackage{amsthm}
+\usepackage{geometry}[margins = 1in]
+\renewcommand{\baselinestretch}{1.5}
+\theoremstyle{definition}
+\usepackage{algorithm}
+%\usepackage[round]{natbib}
+\usepackage[acronym]{glossaries}
+\usepackage{todonotes}
+\usepackage{mathtools}
+%\usepackage{natbib}
+\usepackage[mathscr]{euscript}
+\let\euscr\mathscr \let\mathscr\relax% just so we can load this and rsfs
+\usepackage[scr]{rsfso}
+\newcommand{\powerset}{\raisebox{.15\baselineskip}{\Large\ensuremath{\wp}}}
+%\loadglsentries{glossary}
+%\usepackage[backend=biber,citestyle=numeric]{biblatex}
+\addbibresource{bibliography.bib}
+\title{\textsc{Scalable Markov Chain Monte Carlo by subsampling methods}}
+\author{\textsc{Oda Johanne Kristensen}}
+\date{}
+\usepackage{listings}
+\title{Title}
+\subtitle{Optional Subtitle}
+\author{Author}
+
+\includeonly
+{
+    sections/introduction,
+    sections/chapter2, 
+    sections/chapter3, 
+    sections/chapter4
+    %sections/chapter5
+}
+
+\begin{document}
+
+    \frontmatter        % Folios in Roman numerals, unnumbered chapters.
+
+    %\masterfrontpage
+
+    %\include{sections/abstract}
+   % \include{sections/acknowledgements}
+
+    \cleartorecto
+    \tableofcontents    % Or \tableofcontents*
+    \cleartorecto
+    \listoffigures      % Or \listoffigures*
+    \cleartorecto
+    %\listoftables       % Or \listoftables*
+
+    \mainmatter         % Folios in Arabic numerals, numbered chapters.
+
+   \include{sections/introduction}
+
+    %\part{The First Part}
+
+   \include{sections/chapter2}
+    \include{sections/chapter3}
+    \include{sections/chapter4}
+    %\include{sections/chapter5}
+
+    %\appendix           % "Chapter" is renamed "Appendix"
+    %\appendixpage       % Similar to \part*{Appendices}, but appears in TOC.
+
+    %\include{sections/appendixA}
+    %\include{sections/appendixB}
+
+    \backmatter         % Folios in Arabic numerals, unnumbered chapters.
+%\bibliographystyle{abbrvnat}
+
+    \printbibliography
+\end{document}

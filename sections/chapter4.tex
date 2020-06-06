@@ -1,0 +1,21 @@
+\chapter{Discussion and conclusion}
+In this thesis, we have performed experiments of statistical inference using subsampling methods for Markov Chain Monte Carlo. As we saw in chapter \ref{chap:method}, the Firefly Monte Carlo, Bardenet et al. 2014 subsampler and Bardenet et al. 2017 subsampler all have the correct posterior distribution as its invariant distribution, unlike the naive subsampler. The conservation of the correct posterior distribution is a crucial feature of a subsampling method, \todo{setning?} as inference will not be correct if the invariant distribution of the Markov chain is not the posterior distribution of the parameters. 
+
+As we saw in chapter \ref{sec:Firefly}, the Firefly algorithm is quite simple to implement. As long as it is possible to create a lower bound for the likelihood function, the Firefly Monte Carlo method can be applied. A lower bound may be a Taylor approximation about some starting value $\theta^{}\left(0\right)$.  Taylor approximations are bounded by the Taylor-Lagrange theorem given in  \eqref{eq:taylor_lagr} and \eqref{eq:taylor_lagr_multivar}. Thus, it is simple to create such a lower bound as long as the derivatives up to the order needed in the Taylor-Lagrange theorem. Lower bounds can also be made in other ways, i.e. as in  \cite{Maclaurin:1} with Jaakola and Jordan lower bound. In the experiments section of this thesis, Chapter \ref{chap:experiments}, we have only considered lower bounds in form of the Taylor expansion, but it could be interesting to compare the performance of the Firefly method using different lower bounds for the likelihood.
+
+As we saw from the tables \ref{tab:ll_evals_10k}, \ref{tab:ll_evals_50k}, \ref{tab:ll_evals_100k}, \ref{tab:multiple_evals_10k}, \ref{tab:multiple_evals_50k} and \ref{tab:multiple_evals_100k},  the number of  likelihood evaluations, for the Firefly method is strongly dependent on the the initial value of $\theta$, i.e. the point of which the Taylor expansion is made about.
+Here, one may argue that some of the $\theta^{\left(0\right)}$ were extremely far from the true value. In simple cases, such as logistic regression, one could use an optimization algorithm, like \texttt{optim} or used the \texttt{glm}-function to get good approximations of the parameters. 
+However, in more complex cases, it may not be possible to get good approximations from these methods, and the starting values may be far from the true value. 
+Thus we thought it was interesting to see how the methods were affected by bad starting values. 
+
+ 
+For $\theta^{\left(0\right)}$ far from the true $\theta$, the number of likelihood evaluations is essentially the same as as the Metropolis-Hastings algorithm.
+Considering that the Firefly algorithm in addition to calculating the likelihood evaluations has to calculate the lower bounds of the likelihood evaluations, there is clearly no computational gain of using the Firefly algorithm in this situation.
+
+From the tables referenced above, we see that for $\theta^{\left(0\right)}$ close to the true $\theta$, on the other hand,  the number of likelihood evaluations is reduced considerably compared to the number for the Metropolis-Hastings algorithm. 
+This can also be seen in tables \ref{tab:ll_evals_10k_normal}, \ref{tab:ll_evals_50k_normal} and \ref{tab:ll_evals_100k_normal}, where all $\theta^{\left(0\right)}$ are close to the true $\theta$. Just looking at the values from the tables, one could think that the Firefly algorithm may be the answer to reduce the cost of MCMC sampling, at least when we are certain that $\theta^{\left(0\right)}$ is close to the true $\theta$. 
+
+However, there are other factors to consider when assessing the quality of the method. First, looking at the densities of figures \ref{fig:chain_10k_04_06_normal}, \ref{fig:chain_10k_20_06} and  \ref{fig:chain_50k_20_06}, we see estimated posterior densities from the Firefly method is not 
+
+
+

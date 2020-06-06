@@ -1,0 +1,225 @@
+\chapter{Introduction}
+\label{sec:intro}
+
+\section{Notation}
+$\theta$ : Model parameter \\
+$\mathbf{X}$ : \\
+$\mathbf{x}$: explanatory variable \\
+$\mathbf{Y}$: \\
+$\mathbf{y}$: response \\
+$\mathbf{z}:$ auxilliary variables \\ 
+$n$: indexes the data \\ 
+$i$: indexes the simulated parameters \\
+$p\left(\cdot\right):$ A probability mass function or a probability density function  Its arguments indicate whether it is a prior, posterior or other.  \\
+$g\left(\cdot\mid \theta \right):$ proposal distribution MCMC
+
+\section{Bayesian statistics}\label{sec:bayesian}
+Traditionally, statistics has been divided into two schools, frequentist statistics and Bayesian statistics. 
+There are many interpretations of the difference in philosophy between these two schools, which we will not go into very deeply here, but statisticians in favour of using Bayesian methods rather than frequentist, argue that one limitation of frequentist methods is that inference is not conditional on the observed data \cite{Wagenmakers}. 
+In the frequentist approach, the parameter $\theta$ is thought of as fixed, but unknown, meaning that there exists some true $\theta$ that can describe the model, and inference about this parameter is only based on the available data from that population. 
+In Bayesian statistics on the other hand, $\theta$ is represented by a probability distribution. Using a probability distribution to represent $\theta$, allows us to express that there is an uncertainty in the true value of $\theta$. In Bayesian inference there are two distributions that represent $\theta$.  
+Before any data has been considered, a belief, or knowledge about $\theta$ is represented by what we call the prior\cite{SI}. The prior is  a probability distribution, which can be flat if we have very little knowledge of $\theta$ or it may be more informative in a certain area of the distribution if there is a lot of prior knowledge. 
+\todo{Sjekk denne referansen}
+When data is present, the knowledge we have about $\theta$ is updated by the observed data through Bayes theorem, and the result is what we call the posterior distribution. 
+\begin{theorem}{\textsc{Bayes' theorem}}\label{eq:Bayes}
+\vspace{1em}
+\begin{equation}
+    p\left(a\mid b \right) = \frac{p\left(a\right)p\left(b\mid a \right)}{p\left(b\right)}
+\end{equation}
+\end{theorem} In the setting of Bayesian statistics, Theorem \ref{eq:Bayes} is often presented as
+\begin{equation}\label{eq:Bayes_bayesian}
+p\left(\theta\mid y\right) = \frac{p\left(\theta\right)p\left(y\mid\theta\right)}{p\left(y\right)} = \frac{p\left(\theta\right)L\left(\theta, y\right)}{p\left(y\right)}
+\end{equation}
+Here, $p\left(\theta\mid y \right)$ is the posterior distribution of $\theta$, $p\left(\theta\right)$ is the prior, $p\left(y\mid\theta\right) = L\left(\theta, y\right)$ is the distribution of the data given the model parameter $\theta$, also known as the likelihood function, and $p\left(y\right)$ is the marginal distribution of the observed data.  As we see from \eqref{eq:Bayes_bayesian}, the shape of the posterior is dependent on both the prior distribution and the likelihood, so the shape of our chosen prior affects the shape of the resulting posterior. 
+All of Bayesian statistics revolve around Bayes' theorem and the posterior distribution. Where frequentist use the likelihood for inference, Bayesians use the posterior.  
+There are many benefits of this, one of which is the interpretation of uncertainty intervals. 
+A frequentist $\alpha \times 100\%$-confidence interval about a parameter $\theta$ has to be interpreted as \textit{if we repeat the experiment infinitely many times, the true value of $\theta$ will be inside the $\alpha\times 100\%$-confidence interval, in $\alpha\times 100\%$ of the cases}.
+This frequentist interpretation of the uncertainty interval may differ from what we intuitively would expect an uncertainty interval to express: the probability that the parameter is inside the uncertainty interval is $\alpha$. 
+This interpretation of the uncertainty interval may be achieved within a Bayesian setting.
+In Bayesian statistics credibility intervals are used in stead of confidence intervals.
+For credibility intervals, the probability that the true parameter $\theta$ is inside a $\alpha\times 100\%$ credibility interval is $\alpha\times 100\%$ conditional on the given data. 
+One benefit of Bayesian inference is that it often seems more intuitive than the corresponding frequentist method.
+Despite having many benefits, there are some critics of Bayesian statistics. One of which is the concern that the use of prior introduces subjectivity in the inference, as the statistician has to chose prior herself\cite{gelman2008objections}.
+Another problem with Bayesian statistics, is that it is often computationally costly.
+As we have discussed, the prior in (\ref{eq:Bayes}), $p\left(\theta\right)$ is known, as the statistician chose it herself. The likelihood $L\left(\theta, y\right)$ is known when the data is given and we know its distribution given the parameters.
+The problem is the denominator, $f\left(y\right)$, which is the marginal distribution of the data. This is especially a problem when the prior is not of a conjugate class of the likelihood. 
+\begin{equation}\label{eq:marginal}
+    p\left(y\right) = \int_{\Theta}p\left(y,\theta\right) d\theta = \int_{\Theta} p\left(\theta\right)L\left(\theta, y\right) d\theta
+\end{equation}
+In many cases, this integral may not be analytically tractable, and we need numerical methods, like Markov Chain Monte Carlo (MCMC) or the newer method, variational inference, to calculate an approximation of (\ref{eq:marginal}) Out of the two, MCMC is significantly slower than variational inference, but MCMC has the advantage that it is asymptotically exact \cite{vi}.
+
+For complex models, such as high dimensional problems or models with a lot of data, computation of the marginal density of the data is a major disadvantage of Bayesian inference. 
+MCMC is very computational expensive, and MCMC methods may run slowly in cases where the model is complex, or there is a lot of data. The reason for this is that the computational cost typically scales with the number of data, as the likelihood of each data point has to be evaluated in every iteration of the MCMC. In these situations, the computational cost of MCMC may be substantial.  In this thesis we will study methods that attempt to ease the problem of computational cost, by only evaluating the likelihood of a subsample of the data in each iteration.   
+\section{Markov chains}\label{sec:markov}
+\subsection{Discrete case}\label{subsec:markov_discrete}
+To explain the idea behind MCMC, we first need to recall some Markov chain theory. 
+A Markov chain is a sequence of probabilistic states, where the state at the current time is only dependent on the previous state. 
+\par
+We let $\{\theta^{\left(t\right)}\}, \; t = 0, 1, \ldots, T$, \todo{må velge en annen bokstav enn $n$} be a sequence of random variables where $\theta^{\left(t\right)}$ is called the state at time $t$. In a general case, the joint distribution of the random sequence $\theta^{(0)}, \ldots, \theta^{(T)}$ is given by the product of the conditional distributions of each random variable given its history \cite{CS}.  i.e. 
+\begin{equation*}
+    p\left(\theta^{(0)}, \ldots, \theta^{(T)}\right) = p\left(\theta^{(0)}\right) p\left(\theta^{(1)}\mid \theta^{(0)}\right)  \cdots  p\left(\theta^{(T)}\mid \theta^{(T-1 )},\ldots, \theta^{(0)}\right)
+\end{equation*}
+However, for a sequence of random variables $\{\theta^{(t)}\}$ possessing the Markov property, the state at the current time step,  $t$, $\theta^{(t)}$ will only be dependent on the previous state $\theta^{(t-1)}$, so the conditional distribution of the random variable $\theta^{(t)}$ given its history, can be simplified to
+\begin{equation}\label{eq:markov}
+    p\left(\theta^{(t)}\mid \theta^{(t-1)}, \theta^{(t-2)}, \ldots, \theta^{(0)}\right) = p\left(\theta^{(t)}\mid \theta^{(t-1)}\right)
+\end{equation}
+and so the joint distribution of the random sequence is given by 
+\begin{equation*}
+    p\left(\theta^{(0)}, \ldots, \theta^{(T)}\right) = p\left(\theta^{\left(0\right)}\right)\prod_{t = 0}^{T-1} p\left(\theta^{(t+1)}\mid \theta^{(t)}\right)
+\end{equation*}
+For further reference we define some concepts relating to Markov chains.
+\theoremstyle{definition}
+\begin{definition}{\textsc{Irreducibility}} A Markov chain is said to be irreducible if $\forall i, j \quad \exists m > 0 \quad s.t. \\ P\left(\theta^{(m+n)} = i\mid \theta^{(n)} = j \right) > 0$
+\end{definition}
+i.e. any state $i$ can be reached from any state $j$ in a finite number of steps, $m$.
+\theoremstyle{definition} \todo{State vs. Markov kjede}
+\begin{definition}{\textsc{Recurrency}}
+A state $i$ of a Markov chain is said to be recurrent if the Markov chain has a probability of $1$ of returning to that state.  I.e, $$T_i = \min\left\{ n > 1 \mid \theta^{\left(n\right)} = i\right\}.\;\text{Then}, \; P\left(T_i < \infty\mid \theta^{\left(0\right)} = i\right) = 1$$
+\end{definition}
+\begin{definition}{\textsc{Periodicity}} 
+A Markov chain that can only return to a state in a multiple of $d>1$ steps, is said to be periodic. 
+\end{definition}
+\theoremstyle{definition}
+\begin{definition}{\textsc{Aperiodicity}}
+A Markov chain is said to be aperiodic if all states in the state space have period 1. 
+\end{definition}
+\todo{Trenger kilde her}
+If a Markov chain satisfy the conditions of irreducibility, recurrency and aperiodicity, then there exists a unique \todo{referanse/bevis} distribution $\mathbf{\pi}$ such that
+
+\begin{equation*}
+    \pi_j = \lim_{t\rightarrow{}\infty} P\left(\theta^{\left(t\right)} = j \mid \theta^{\left(0\right)} = i \right) =  \sum_{i \in A} \pi_i P\left(\theta^{\left(n\right)} = j \mid \theta^{\left(n-1\right)} = i\right)
+\end{equation*}
+\todo{Dette er for kontinuerlig tilfelle}
+\subsection{Continuous case}
+Often, we want to simulate samples from a continuous distribution using MCMC. In these cases, continuous Markov models are needed, and so the definitions in section \ref{subsec:markov_discrete} are not sufficient. 
+In order to have the Markov chain converge to the stationary distribution, we need some conditions that must be satisfied \cite{MCMC_in_pract}. 
+In the general case, irreducibility is defined with respect to a distribution. 
+We let $E$ denote the state space, \textbf{which must satisfy some conditions}, and $\tau_A$ denote the number of steps until the first return of a Markov chain to a set $A\subset E$.  
+$\tau_A = \inf\left\{n\geq 1 : X_n \in A\right\}$. If the chain never returns to $A$, $\tau_A = \infty$.
+\begin{definition}{\textsc{Irreducibility}}\label{def:gen_irr}
+   A Markov chain is $\phi$-irreducible for a probability distribution $\phi$ on $E$ if $\phi\left(A\right) > 0$ for a set $A\subset E$ implies that $$P_x\left\{\tau_A < \infty\right\} > 0$$ for all $x\in E$ a chain is irreducible if it is $\phi$-irreducible for some probability distribution $\phi$. If a chain is $\phi$-irreducible, then $\phi$ is called an irreducibility distribution for the chain. 
+\end{definition}
+From definition \ref{def:gen_irr}, we see that the \textbf{probability of the chain to return to set $A$ is positive}.  
+For the next definition, we need to define the term \textit{maximal irreduciblity distribution}. If a Markov chain is irreducible, it can be shown that it has a distribution $\psi$, called the maximal irreducibility distribution, where all other irreducibility distributions are absolutely continuous with respect to $\psi$.  
+\begin{definition}{\textsc{Recurrence}}
+An irreducible Markov chain with maximal irreducibility distribution $\psi$ is recurrent if for any set $A\subset E$ with $\psi\left(A\right)>0$ the conditions
+$$(i)\quad P_x \left\{X_n \in A \; \textit{infinitely often}\right\} > 0\quad \textit{for all}\; x$$ 
+$$(ii) \quad P_x\left\{X_n\in A \; \textit{infinitely often} \right\} = 1 \quad \textit{for}\;\psi \textit{-almost all} \; x$$
+are both satisfied. An irreducible recurrent chain is positive recurrent if it has an invariant probability distribution.
+Otherwise it is null recurrent. 
+\end{definition}
+If a continous Markov chain satisfy the conditions of irreducibility, recurrency and aperiodicity, then there exists a unique distribution $\left(p\left(\theta\right)$ \todo{Er det greit å bruke $\left(\theta\right)$ her? }  
+\begin{equation*}
+\lim_{t\xrightarrow{}\infty}p\left(\theta^{(t)}\in A\mid \theta^{(0)} = x\right) = \int_{A} f\left(y\right) dy
+\end{equation*}
+where $f\left(x\right)$ is what we call the stationary distribution of the Markov chain. Then we find the stationary distribution by solving 
+\begin{equation}\label{eq:MCstationary}
+    f(y) = \int_x f(x) P(y\mid x) dx 
+\end{equation}In our case, we want the stationary distribution $f(x)$ be the posterior distribution, so we need to find a transition density  $P\left(y\mid x\right)$ that satisfies (\ref{eq:MCstationary}). This may be difficult, but \textit{detailed balance} is a sufficient criterion for (\ref{eq:MCstationary}). \todo{referanse/bevis}
+\theoremstyle{definition}
+\begin{definition}{\textsc{Detailed Balance}} \label{def:detailed_balance}
+   $ f(y)P\left(y\mid x\right) = f(x)P\left(x\mid y\right)$
+\end{definition}
+So a Markov chain with transition density $P\left(x\mid y\right)$ that satisfies (\ref{def:detailed_balance}) will have $f$ as stationary distribution. 
+\textbf{What about aperiodicity?}
+\section{Markov Chain Monte Carlo}
+MCMC are  methods used to sample from a distribution close to the posterior when it is difficult to sample from the true posterior. As mentioned in section \ref{sec:bayesian}, 
+doing inference when the prior $p\left(\theta\right)$ is not a conjugate distribution of the likelihood $f\left(x ; \theta\right)$ can be very difficult.
+Instead of evaluating the true posterior directly, we approximate it by drawing values of $\theta$ from an approximate distribution. 
+As we saw in  section \ref{sec:markov}, an irreducible, recurrent, aperiodic Markov chain has a unique stationary distribution $f(x)$.
+In the context of Markov Chain Monte Carlo, we want to construct a Markov chain in such a way that the stationary distribution of the Markov chain is the posterior distribution that we are interested in. 
+\subsection{Convergence of Markov chain to stationary distribution}\label{sec:convergence}
+When a Markov chain with the desired invariant distribution is constructed, one must also ensure that the chain converges to that invariant distribution and find the correct size of the burn-in, $D$, and an appropriate number of iterations $D+L$. There exist several  methods to evaluate convergence, but in this thesis, we will use Gelman-Rubin statistic to ensure that the chain is sufficiently close to the invariant distribution. The idea of the Gelman-Rubin diagnostic method is to run a number of parallel chains, $J$, and compare the within-chain variance of chain $j$ with the out of chain variance \cite{CS}. The within-chain variance of the is defined as 
+\begin{equation*}
+    s_j^2 = \frac{1}{L-1}\sum_{t = D}^{D + L - 1} = \left(\theta_j^{\left(t\right)} - \bar{\theta}_j\right)^2
+\end{equation*}
+and the out of chain variance as 
+\begin{equation*}
+    B = \frac{L}{J-1}\sum_{j=1}^J \left(\bar{\theta}_j - \bar{\theta}\right)^2
+\end{equation*}
+with 
+\begin{equation*}
+    \bar{\theta_j} = \frac{1}{L}\sum_{t = D}^{D+L-1} \theta_j^{\left(t\right)}, \quad \bar{\theta} = \frac{1}{J} \sum_{j=1}^J \bar{\theta}_j.
+\end{equation*} 
+$W$ is defined as the average within-chain variance 
+\begin{equation*}
+    W = \frac{1}{J} \sum_{j = 1}^J{s_j^2}
+\end{equation*}
+Then the Gelman-Rubin statistic is defined as 
+\begin{equation}\label{eq:Gelman-Rubin}
+    R = \frac{\left[\left(L-1\right)/L\right]W + \left(1/L\right)B}{W}
+\end{equation}
+\todo{"Both the numerator and the denominator should estimate the marginal variance of $X$}
+The value of $\sqrt{R} \xrightarrow{} 1$ as $L \xrightarrow{} \infty$, so if $\sqrt{R}$ is sufficiently close to 1, it is an indication that the size of the burn-in, $D$ and the length of the chain $L$ both are sufficiently large. However, according to \cite{CS}, $R$ the numerator of \eqref{eq:Gelman-Rubin} is a bit to large, and the denominator is a bit to small, so in practice, an adjusted statistic $\hat{R}$ is often used, where
+\begin{equation}\label{eq:Gelman-Rubin_adjusted}
+    \hat{R} = \frac{J+1}{J}R - \frac{L-1}{JL} 
+\end{equation}
+A value $\sqrt{\hat{R}}<1.1$ is said to indicate that both $D$ and $L$ are sufficiently large.
+The transition kernel, $P\left(\theta, \Theta\right)$, of a Markov chain is a probability distribution function conditional on the current state $\theta$ that gives the probability of moving to a new state $\theta'$ in the parameter space $\Theta$ \cite{chib1995understanding}. The transition kernel is the continuous case equivalent to the transition matrix. \todo{Skulle endre noe her, men hva? } For MCMC, we have to find a transition kernel that is such that the invariant distribution of the chain is $\pi\left(\theta\right)$, the distribution of interest. 
+
+\subsection{MCMC with auxiliary variables}
+The idea of using auxiliary variables in MCMC methods has existed for some time. 
+\cite{Besag} suggested using auxiliary variables for tackling multimodal posteriors.
+With $\theta$ as parameter of interest, and $z$ some auxiliary variable, they have $p\left(\theta\right)$ the (marginal) distribution of interest, and $p\left(z\mid\theta\right)$ the conditional distribution of $z$ given $x$. 
+Then, with $\pi\left(\theta, z\right) = \pi\left(\theta\right)\pi\left(z\mid\theta\right)$ 
+First drawing $z$ from $p\left(z\mid \theta\right)$, then drawing $\theta'$ from $\pi\left(\theta\mid z\right)$ as part of one iteration of the MCMC, preserves $p\left(\theta\right)$ as a stationary distribution. 
+$$p\left(\theta\mid z\right) = \frac{p\left(\theta\right) p\left(z\mid\theta\right)}{p\left(z\right)}$$
+Using such auxiliary variables has shown to have benefits in various applications. 
+As we can read in \cite{Besag}, the method of auxiliary variables has, as an example, proven to be particularly useful in physics research through the Swendsen-Wang algorithm, 
+\\ \\ In section \ref{sec:Firefly}, we will see such auxiliary variables used in combination with subsampling of data.
+\subsection{MCMC with delayed rejection}
+Delayed rejection is a method used in MCMC to avoid the chain of getting stuck in a restricted area of the target distribution. As \cite{mira2001metropolis} argues, if the chain is restricted to only a part of the state space not only will it fail in exploring the full state space, but the in-chain correlation will also be large. 
+Because of this, the parameter estimates obtained from a MCMC by averaging over the chain will not be as effective in the case where the chain might get stuck.  i.e. the estimates will have a higher variance, than when the chain is able to \textbf{move} over the full state space.
+A larger probability of accepting the candidate will reduce the problem of the restricted chain. 
+As a method of increasing the acceptance probability, \cite{mira2001metropolis} suggests different forms of delayed rejection. One of the suggested mechanisms is to draw a new proposal for that certain iteration, and not progress to the next iteration until some proposed candidate has been accepted. 
+They also suggest variants of this method, like progressing to the next iteration after the second rejection, or progressing to the next iteration with some probability $p$ after the second rejection, otherwise continue drawing a new proposal. 
+The method presented in \cite{mira2001metropolis} will attempt to reduce the problems discussed here, while at the same time retaining the original stationary distribution.
+\todo{Fungerer dette bare for random walk? ikke for independence sampler? avhengighet av rejected proposals altså}  
+
+\subsection{MCMC with delayed acceptance}
+The concept of delayed acceptance is related to that of delayed rejection, but the objective of delayed acceptance differs from the objective of delayed rejection. While delayed rejection wants to reduce the in-chain correlation, and ensure that the chain visits the whole state space, the objective of delayed acceptance is mainly to reduce the computational cost of the accept-reject step.  
+This is done by dividing the data in batches, and  \todo{fulfør setning}
+\section{The Metropolis-Hastings algorithm}\label{subsec:mh}
+The MH algorithm is a very general algorithm and one of the most popular algorithms for MCMC. 
+The algorithm for MH is given below.
+\begin{algorithm}[H]\label{algo:MH}
+    \caption{Metropolis-Hastings}
+    \label{algo:MH}
+    \begin{algorithmic}[1] % The number tells where the line numbering should start\
+        \State $\theta \sim \textsc{InitialDist}$ 
+        \For {$i \gets 1 \ldots \textsc{Iters}$}
+        \State$\theta' \sim g\left(\cdot \mid \theta^{\left(i-1\right)}\right)$
+        \State $u\sim \textsc{Uniform}\left(0,1\right)$
+        \If{ $\frac{p\left(\theta' \mid \mathbf{x}\right) g\left(\theta^{\left(i-1\right)}\mid \theta'\right)}{p\left(\theta^{\left(i-1\right)}\mid \mathbf{x}\right)g\left(\theta'\mid \theta^{\left(i-1\right)}\right)} > u$}
+        \State $\theta^{\left(i\right)} = \theta'$
+        \Else 
+        \State $\theta^{\left(i\right)} = \theta^{\left(i-1\right)}$
+         \EndIf
+         \EndFor
+    \end{algorithmic}
+\end{algorithm}
+\todo{Se på notater fra STK4051 hvordan "posterior" forseling uttrykkes der (i algoritmen), vil ha mest mulig generell. }
+In algorithm \ref{algo:MH}, $g\left(\cdot \mid \theta_{i-1}\right)$ is called the proposal distribution of $\theta$. 
+With MH, we can draw samples from any probability distribution, as long as a function that it is proportional of, i.e. we need to know the numerator in (\ref{eq:Bayes}), but we do not need to know the denominator, $f\left(x\right)$.
+As we saw in section \ref{sec:bayesian}, $f\left(x\right)$ is often difficult to calculate, so this suits us well. 
+We must show that the invariant distribution of the Metropolis-Hastings algorithm actually is the posterior density that we are interested in.
+
+The transition kernel for the Metropolis-Hastings algorithm is given by
+\begin{equation}
+    P\left(\theta, \theta'\right) = \alpha\left(\theta, \theta'\right) + \delta_{\theta} \left(d\theta\right)\left(1 - \int \alpha\left(\theta, \vartheta\right)g\left(\vartheta\mid \theta\right) d \vartheta \right)
+\end{equation}
+where $\alpha\left(\theta, \theta'\right)$ is the probability of acceptance of $\theta'$, $\delta_{\theta}\left(d\theta\right) = 1$ if  \todo{stemmer dette? ref "Understanding the Metropolis-Hastings algorithm}$\theta \in d\theta'$, $0$ otherwise \cite{chib1995understanding},  $g\left(\theta'\mid \theta\right)$ is the proposal distribution, i.e. the distribution that we sample the proposal $\theta'$ from. 
+So we can interpret $P\left(\theta , d\theta'\right)$ as the probability of accepting $\theta'$,  $\alpha\left(\theta, \theta'\right)$ plus the probability of rejecting $\theta'$, 
+$1 - \int \alpha\left(\theta, \vartheta\right) g\left(\vartheta\mid \theta \right) d\vartheta$. 
+\section{Problems with the M-H algorithm}
+As we see from the set-up of the Metropolis-Hastings algorithm, the computational time of course depends on the number of iterations we choose. 
+The number of iterations is needed is determined by how quickly the chain converges to the invariant distribution.
+As we saw in section \ref{sec:convergence}, we can determine a minimum number of iterations needed through the Gelman-Rubin statistic. 
+If the number of iterations is not chosen large enough, we will not draw samples from the correct distribution, and thus we cannot choose a lower value than what is supported by the Gelman-Rubin statistic if we want to get meaningful results. So even though we can choose the number of iterations\todo{Finn symbol}, there are limitations to how small we can choose it, without compromising the quality of the results. 
+\\
+The computational time of the Metropolis-Hastings algorithm is also proportional to the number of data points through the calculation of the likelihood function for all the data with the given parameters.
+When $N$ is the number of data points, evaluating this likelihood function has a computational cost of  $\mathcal{O}(N)$, or more for complex models. 
+If the data set that we calculate the likelihood from is large, the computer will spend a significant amount of time calculating the likelihood at each iteration, and so the program will run slowly. 
+In this thesis, we will try to tackle these problems for M-H with large data, using different subsampling methods for the M-H algorithm. 
+Using only subsamples of data in each Monte Carlo iteration reduces the computational cost, but it may also make the resulting chain more unstable, and inhibit the Markov chain to converge. 
+ \todo{cite?}
