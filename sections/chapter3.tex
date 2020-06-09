@@ -17,7 +17,7 @@ The methods we have tested are given in the table below
     \label{tab:experiment_overview}
 \end{table}{}
 We will use the number of required likelihood evaluations before convergence of the chain to the invariant distribution to be a measure of a methods performance.
-Here, we will use the Gelman-Rubin statistic as a criterion for convergence, and also use the within chain correlation and other criterions to asses the quality of the method. 
+Here, we will use the Gelman-Rubin statistic as a criterion for convergence, and also use the within chain correlation and other criteria to assess the quality of the method. 
 \todo{fiks setning}
 \texttt{Obviously} the methods presented in the previous sections have fewer likelihood evaluations per iteration, but one can imagine that because of fewer likelihood evaluations, the number of iterations needed to mixing may be larger than for the vanilla MH algorithm. 
 
@@ -52,7 +52,7 @@ N = 1000
 x = rnorm(N, 0, 1)
 \end{lstlisting}
 In this experiment, we have sampled $\sigma$ on a log-scale, and adjusted the proposal distribution accordingly. 
-\subsection{Table over likelihood evaluations}
+\subsection{Table of likelihood evaluations}
 \begin{table}
     \centering
 \begin{tabular}{|c|c|c|c|c|}
@@ -100,7 +100,7 @@ In this experiment, we have sampled $\sigma$ on a log-scale, and adjusted the pr
 \hline
         $\theta_{init}$ &  MH & FlyMC & Bardenet et al. 2014 & Bardenet et al. 2017\\ 
          \hline \hline$\theta_1$ & $200,000,000$ & $12,203,876$ & $113,786,516$ & $176,457,944$ \\
-        $\theta_2$ & $200,000,000$ & $16,246,388$ & $141,996,366$ & $175,813,952$ \\
+        $\theta_2$ & $200,000,000$ & $11,994,984$ & $113,961,610$ & $175,813,952$ \\
         $ \theta_3$ & $200,000,000$ & $11,862,396$ & $114,699,276$ & $176,127,488$ \\
         $\theta_4$ & $200,000,000$ & $12,680,344$ & $114,265,162$ & $176,973,752$ \\
         $\theta_5$ &$2000,000,000$&$11,653,048$&$114,328,384$&$176,256,160$
@@ -109,7 +109,7 @@ In this experiment, we have sampled $\sigma$ on a log-scale, and adjusted the pr
 \caption{The number of likelihood evaluations for each method with different starting values for $\theta$ with 100 000 MCMC iterations.}
 \label{tab:ll_evals_100k_normal}
 \end{table} 
-
+\subsection{Plot for 10k iterations}
 \begin{figure}%
     \centering
     \subfloat[$\theta_{init} = \theta_1$]{\includegraphics[scale=0.3, page = 2]{figures/Normal/10k_04_06_theta1.pdf}}%
@@ -121,8 +121,8 @@ In this experiment, we have sampled $\sigma$ on a log-scale, and adjusted the pr
     \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 2]{figures/Normal/10k_04_06_theta4.pdf}}%
     \newline
      \subfloat[$\theta_{init} = \theta_5$]{\includegraphics[scale=0.3, page = 2]{figures/Normal/10k_04_06_theta5.pdf}}%
-    \caption{Posterior densities for all methods, with different starting values for $\theta$.  }%
-    \label{fig:chain_10k_04_06_normal}%
+    \caption{Estimated posterior densities for all methods, with different starting values for $\theta$.  }%
+    \label{fig:density_10k_04_06_normal}%
 \end{figure}
 
 
@@ -137,8 +137,8 @@ In this experiment, we have sampled $\sigma$ on a log-scale, and adjusted the pr
     \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/10k_04_06_theta4.pdf}}%
     \newline
      \subfloat[$\theta_{init} = \theta_5$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/10k_04_06_theta5.pdf}}%
-    \caption{Posterior densities for all methods, with different starting values for $\theta$.  }%
-    \label{fig:density_10k_04_06_normal}%
+    \caption{Chains for all methods, with different starting values for $\theta$.  }%
+    \label{fig:chain_10k_04_06_normal}%
 \end{figure}
 
 
@@ -155,7 +155,69 @@ In this experiment, we have sampled $\sigma$ on a log-scale, and adjusted the pr
     \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 6]{figures/Normal/10k_04_06_theta4.pdf}}%
     \newline
      \subfloat[$\theta_{init} = \theta_5$]{\includegraphics[scale=0.3, page = 6]{figures/Normal/10k_04_06_theta5.pdf}}%
-    \label{fig:autocorrelation_10k_02_06}%
+    \label{fig:autocorrelation_10k_04_06_normal}%
+\end{figure}
+
+\subsection{Plot for 50k iterations}
+\begin{figure}%
+    \centering
+    \subfloat[$\theta_{init} = \theta_1$]{\includegraphics[scale=0.3, page = 2]{figures/Normal/50k_04_06_theta1.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_2$]{\includegraphics[scale=0.3, page = 2]{figures/Normal/50k_04_06_theta2.pdf}}%
+    \newline
+    \subfloat[$\theta_{init} = \theta_3$]{\includegraphics[scale=0.3, page = 2]{figures/Normal/50k_04_06_theta3.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 2]{figures/Normal/50k_04_06_theta4.pdf}}%
+    \newline
+     \subfloat[$\theta_{init} = \theta_5$]{\includegraphics[scale=0.3, page = 2]{figures/Normal/50k_04_06_theta5.pdf}}%
+    \caption{Estimated posterior densities for all methods, with different starting values for $\theta$.  }%
+    \label{fig:density_50k_04_06_normal}%
+\end{figure}
+
+\begin{figure}%
+   \centering
+    \subfloat[$\theta_{init} = \theta_1$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta1.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_2$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta2.pdf}}%
+    \newline
+    \subfloat[$\theta_{init} = \theta_3$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta3.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta4.pdf}}%
+    \newline
+     \subfloat[$\theta_{init} = \theta_5$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta5.pdf}}%
+    \caption{Chains for all methods, with different starting values for $\theta$.  }%
+    \label{fig:chain_50k_04_06_normal}%
+\end{figure}
+
+
+\begin{figure}%
+
+    \caption{Autocorrelation for all methods, with different starting values for $\theta$. }%
+      \centering
+    \subfloat[$\theta_{init} = \theta_1$]{\includegraphics[scale=0.3, page = 6]{figures/Normal/50k_04_06_theta1.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_2$]{\includegraphics[scale=0.3, page = 6]{figures/Normal/50k_04_06_theta2.pdf}}%
+    \newline
+    \subfloat[$\theta_{init} = \theta_3$]{\includegraphics[scale=0.3, page = 6]{figures/Normal/50k_04_06_theta3.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 6]{figures/Normal/50k_04_06_theta4.pdf}}%
+    \newline
+     \subfloat[$\theta_{init} = \theta_5$]{\includegraphics[scale=0.3, page = 6]{figures/Normal/50k_04_06_theta5.pdf}}%
+    \label{fig:autocorrelation_50k_04_06_normal}%
+\end{figure}
+
+\begin{figure}%
+    \centering
+    \subfloat[A]{\includegraphics[scale=0.3, page = 3]{figures/Normal/naive_compared1.pdf}}%
+    \qquad
+    \subfloat[B]{\includegraphics[scale=0.3, page = 3]{figures/Normal/flyMC_compared1.pdf}}%
+    \newline
+    \subfloat[C]{\includegraphics[scale=0.3, page = 3]{figures/Normal/confidence_compared1.pdf}}%
+    \qquad
+    \subfloat[D]{\includegraphics[scale=0.3, page = 3]{figures/Normal/confidence_w_pr_compared1.pdf}}%
+    \caption{All plots A-D shows a Metropolis-Hastings chain, chain 1, plotted together with one other method. In Figure \ref{fig:compare_theta1}.A, chain 2 is the naive subsampler. In Figure\ref{fig:compare_theta1}.B, chain 2 is the Firefly, Figure \ref{fig:compare_theta1}.C is the Bardenet et al. 2014 subsampler and Figure \ref{fig:compare_theta1}.D is the Bardenet et al. 2017 subsampler. $\theta
+   ^{\left(0\right)} = \left(-0.2, -0.05)$}%
+    \label{fig:compare_theta1_normal}%
 \end{figure}
 
 
@@ -163,7 +225,7 @@ In this experiment, we have sampled $\sigma$ on a log-scale, and adjusted the pr
 \subsubsection{10k iterations}
 We ran five chains with different starting values $\theta_{\texttt{init}}$ for $\theta = \left(\mu, \sigma\right)$, where $\theta_{\texttt{init}} \sim \mathcal{N}\left(\theta_{ML}, \; 0.1\right)$. 
 \
-Looking at Figure , we see that the chain seems behave nicely. If we look closely, we can see that some of the starting values may be a bit off, but that this stabilizes quite quickly. We can confirm that the chain $\textbf{mixes nicely}$ by looking at the running average of the simulated $\textbf{parameters}$.
+Looking at Figure , we see that the chain seems to behave nicely. If we look closely, we can see that some of the starting values may be a bit off, but that this stabilizes quite quickly. We can confirm that the chain $\textbf{mixes nicely}$ by looking at the running average of the simulated $\textbf{parameters}$.
 \
 We will also look at the autocorrelation of the chains, also known as the within chain correlation. 
 
@@ -175,7 +237,7 @@ Compared to the simulations from the Metropolis-Hastings algorithm, we see from 
 \subsection{Bardenet et al.'s confidence sampler}
 
 \subsection{Firefly Monte Carlo}
-The experiment design for the Firefly Monte Carlo simulation was the same as described in \ref{subsec:mh_sim}. The exactly the same $\theta_{\texttt{init}}$ where used in these simualtions as in the case of the Metropolis-Hastings simulations. 
+The experiment design for the Firefly Monte Carlo simulation was the same as described in \ref{subsec:mh_sim}. The exactly the same $\theta_{\texttt{init}}$ where used in these simulations as in the case of the Metropolis-Hastings simulations. 
 
 Compared to the simulations from the Metropolis-Hastings algorithm, we see from Figure \ref{fig:simval_fly}, that the number of iterations needed before \textbf{convergence} is quite large. 
 
@@ -468,7 +530,7 @@ The subsampling methods researched in this thesis all try to reduce the computat
 We have run experiments equivalent to those in section \ref{subsec:simple_log_reg}, but with different number of data points and a constant number of iterations. We performed the experiment with number of data points $N = \left\{100, 500, 1000, 5000\right\}$. All experiments were conducted with $20000$ iterations. 
 
 
-\subsection{Multiple logistic regression}
+\subsection{Multiple logistic regression}\label{sec:experiments_multiple_log_reg}
 In addition to simple logistic regression, we did a multiple logistic regression, with nine explanatory variables in addition to a bias term. The explanatory variables  
 were simulated as follows
 \todo{notation}

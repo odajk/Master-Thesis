@@ -1,22 +1,22 @@
 \chapter{Method}\label{chap:method}
 \label{sec:second}
 \section{The naive subsampler}\label{subsec:naive}
-The most intuitive and naive method to reduce the computational cost of a Metropolis-Hastings sampler, in terms of subsampling, is to randomly choose a subset of the data at each iteration, and calculate the log-likelihood ratio, i.e. step 5 in Algorithm \ref{algo:MH}, for this selected subset only. We call this method the naive subsampler.  However, as is pointed out by \cite{Bardenet:1}, this method does not have the correct posterior distribution as its invariant distribution, Instead the invariant distribution of the naive subsampler is a broadened version of the posterior, due to large variance in the log-likelihood ratio. 
+The most intuitive and naive method to reduce the computational cost of a Metropolis-Hastings sampler, in terms of subsampling, is to randomly choose a subset of the data at each iteration, and calculate the log-likelihood ratio. In other words, step 5 in Algorithm \ref{algo:MH} is calculated for the selected subset only. We call this method the naive subsampler.  However, as is pointed out by \cite{Bardenet:1}, this method does not have the correct posterior distribution as its invariant distribution. Instead the invariant distribution of the naive subsampler is a broadened version of the posterior, due to large variance in the log-likelihood ratio. 
  \section{Firefly Monte Carlo}\label{sec:Firefly}
 In their paper from 2014, Maclaurin and Adams  introduced the Firefly Monte Carlo method \cite{Maclaurin:1}. 
 The aim of this method is to reduce the computational cost of MH-like algorithms by evaluating the likelihood function for only a subset of the data, while still keeping the true full-data posterior distribution as the invariant distribution of the Markov chain. As we will see, this is a method with similarities to the naive subsampler, but with some changes in order to preserve the correct invariant distribution.  \\ \\
-We assume the data $x_n$ conditionally independent given $\theta$.
-For each data point $x_n$ Maclaurin and Adams introduce auxiliary variables $z_n \in \{0, 1\}$, and they make use of a strictly positive lower bound, $B_n\left(\theta\right)$ of the likelihood of the $n$'th data point, $L_n\left(\theta\right)$.  Meaning that the condition 
+We assume the data $x_n$ are conditionally independent given $\theta$.
+For each data point $x_n$ Maclaurin and Adams introduce an auxiliary variable $z_n \in \{0, 1\}$, and they make use of a strictly positive lower bound, $B_n\left(\theta\right)$ of the likelihood of the $n$'th data point, $L_n\left(\theta\right)$, meaning that the condition 
 \begin{equation}
     B_n\left(\theta\right) \leq L_n\left(\theta\right)
-\end{equation} is always met. 
-The $z_n$'s are let to be Bernoulli distributed, conditioned on the parameters $x_n$ and $\theta$, \todo{Skal dette være $y_n$?}
+\end{equation} is met for all $\theta$ and all $n$. 
+The $z_n$'s are  Bernoulli distributed, conditioned on the parameters $x_n$ and $\theta$, 
 and drawn from the  Bernoulli distribution:
 \begin{equation}\label{eq:auxiliary_dist}
     p(z_n\mid x_n,\theta) = \left[\frac{L_n(\theta) - B_n(\theta)}{L_n(\theta)}\right]^{z_n}\left[\frac{B_n(\theta)}{L_n(\theta)}\right]^{1-z_n} \quad .
 \end{equation}
 We say that a data point $x_n$ is bright if $z_n = 1$, and that it is dark if $z_n = 0$. 
-From \eqref{eq:auxiliary_dist}, we see that a data point $x_n$ is more likely to be bright if $L_n(\theta) - B_n(\theta)$ is large, i.e. the lower bound $B_n(\theta)$ is not "tight" to the likelihood $L_n(\theta)$. Including these auxiliary variables, we get the following joint probability distribution. 
+From \eqref{eq:auxiliary_dist}, we see that a data point $x_n$ is more likely to be dark if $L_n(\theta) - B_n(\theta)$ is small, i.e. the lower bound $B_n(\theta)$ is tight to the likelihood $L_n(\theta)$. Including these auxiliary variables, we get the following joint probability distribution. 
 \begin{equation*}
 \begin{split}
      p(\theta, \{z_n\}_{n=1}^N\mid\{x_n\}_{n=1}^N) &\propto p(\theta, \{x_n, z_n\}_{n = 1}^N) \\
@@ -27,11 +27,11 @@ From \eqref{eq:auxiliary_dist}, we see that a data point $x_n$ is more likely to
  This can be simplified further by using that each $z_n$ is only dependent on the $n$'th data point $x_n$ and that the $x_n$'s are conditionally independent given $\theta$. 
  The result is the following joint probability 
 \begin{equation}\label{eq:joint}
-           p(\theta, \{z_n\}_{n=1}^N \mid \{x_n\}_{n=1}^N) \propto p(\theta) \prod_{n=1}^N p(x_n\mid\theta)p(z_n\mid x_n, \theta) \quad
+           p(\theta, \{z_n\}_{n=1}^N \mid \{x_n\}_{n=1}^N) \propto p(\theta) \prod_{n=1}^N p(x_n\mid\theta)p(z_n\mid x_n, \theta).
 \end{equation}
 Inserting (\ref{eq:auxiliary_dist}) into (\ref{eq:joint}), and using that $L_n(\theta) = p(x_n\mid\theta)$
 \begin{equation}
-     p(\theta, \{z_n\}_{n=1}^N\mid\{x_n\}_{n=1}^N \propto p(\theta) \prod_{n=1}^N L_n(\theta)\left[\frac{L_n(\theta) - B_n\left(\theta\right)}{L_n\left(\theta\right)}\right]^{z_n}\left[\frac{B_n\left(\theta\right)}{L_n\left(\theta\right)}\right]^{1-z_n} 
+     p(\theta, \{z_n\}_{n=1}^N\mid\{x_n\}_{n=1}^N )\propto p(\theta) \prod_{n=1}^N L_n(\theta)\left[\frac{L_n(\theta) - B_n\left(\theta\right)}{L_n\left(\theta\right)}\right]^{z_n}\left[\frac{B_n\left(\theta\right)}{L_n\left(\theta\right)}\right]^{1-z_n} 
 \end{equation}
 \begin{equation}
 \label{eq:firefly}
@@ -42,48 +42,81 @@ B_n\left(\theta\right) \left[\frac{L_n\left(\theta\right)}{B_n\left(\theta\right
 \end{equation}
 The consequence of (\ref{eq:firefly}) is that it is not necessary to calculate the likelihood term for every data point $x_n$. 
 It is only necessary when that data point is bright, i.e. $z_n = 1$. 
-If a data point is dark, they will not calculate its likelihood $L_n(\theta)$, but only the lower bound of its likelihood, $B_n(\theta)$. It is apparent that calculating the estimate of the posterior given in \eqref{eq:firefly} is less costly than calculating the true posterior, \textit{if} the lower bound of the likelihood, $B_n\left(\theta\right)$ is cheap to compute, and only a share of data points are bright. 
+If a data point is dark, they will not calculate its likelihood $L_n(\theta)$, but only the lower bound of its likelihood, $B_n(\theta)$. It is apparent that calculating the estimate of the posterior given in \eqref{eq:firefly} is less costly than calculating the true posterior, \textit{if} the  lower bound of the likelihood, $B_n\left(\theta\right)$ is cheap to compute. In particular, it is important that $\prod_{n=1}^N B_n\left(\theta\right)$ is cheap to compute, as $\prod_{n=1}^N B_n\left(\theta\right)$ has to be calculated regardless of the value of $z_n$. If $\prod_{n=1}
+^N B_n\left(\theta\right)$ is not cheap to compute, the computational burden will only be shifted from calculating $\prod_{n=1}^N L_n\left(\theta\right)$ to calculating $\prod_{n=1}^N B_n\left(\theta\right)$.  
 As can be seen from (\ref{eq:auxiliary_dist}), the number of bright data points is dependent on the tightness of the lower bounds $B_n(\theta)$, the closer the lower bound $B_n\left(\theta\right)$ is to the true likelihood $L_n\left(\theta\right)$, the fewer bright data points there will be.  
-To limit the amount of time taken to evaluate the joint posterior, the number of bright data points should also be limited. 
-It is important that $B_n(\theta)$ is simple to compute, if not, the computational burden will only be shifted to calculating $B_n(\theta)$ in stead of $L_n(\theta)$. In particular, it is important that $\prod_{n=1}^N B_n\left(\theta\right)$ is simple to compute, as $\prod_{n=1}^N B_n\left(\theta\right)$ has to be calculated regardless of the value of $z_n$. $B_n\left(\theta\right)$ only has to be calculated for an individual point if that point is bright, but since a proportion of the data points will be bright, it is important that the $B_n\left(\theta\right)$ for an individual point also is cheap to compute.  \\ \\
-Choosing a $B_n\left(\theta\right)$ that is sufficiently tight to $L_n\left(\theta\right)$ and is not too costly to evaluate is problem dependent. A bound that may suit many models is the one used in \cite{Bardenet:1}, where the bound is a second degree Taylor  expansion of the likelihood. Using the Taylor-Lagrange inequality, the difference between the likelihood and the Taylor expansion can be bounded, and thus we can create the lower bound $B_n\left(\theta\right)$.  
-%It is not always trivial to find such a $B_n$. 
-%In the case of normally distributed data, we use the same approach as section 7.2.1 in Bardenet et al.
-\todo{Fikk beskjed om å inkludere funksjon for $B_n$, men det vil jo være forskjellig fra modell til modell. Inkluderer allikevel her $B_n$ der det er brukt Taylor-utvikling.}
+To limit the amount of time taken to evaluate the joint posterior, the number of bright data points should also be limited, since for each bright data point, both the lower bound $B_n\left(\theta\right)$, and the likelihood $L_n\left(\theta\right)$ has to be calculated. Thus, if the proportion of bright data points is large, the Firefly algorithm may be more computationally costly than the Metropolis-Hastings. 
+
+Choosing a $B_n\left(\theta\right)$ that is sufficiently tight to $L_n\left(\theta\right)$ and has a cheap to compute product $\prod_{n=1}^N B_n\left(\theta\right)$, is problem dependent. A bound that may suit many models is the one used in \cite{Bardenet:1}, where the bound is a second degree Taylor  expansion of the likelihood. Using the Taylor-Lagrange inequality, the difference between the likelihood and the Taylor expansion can be bounded, and thus we can create the lower bound $B_n\left(\theta\right)$. We will give a recipe of creating such a bound in chapter \ref{taylor_bound_intro}.    
+
+
 \begin{algorithm}[H]
     \caption{Firefly Monte Carlo}
     \label{algo:firefly}
     \begin{algorithmic}[1] % The number tells where the line numbering should start
         \State $\theta \sim \textsc{InitialDist}$ 
         \For {$i \gets 1 \ldots \textsc{Iters}$}
+        \State $\theta = \theta^{\left(i-1\right)}$
         \For {$j \gets \left[N\times \textsc{ResampleFraction}\right]$}
         \State $n\sim \textsc{RandInteger}\left(1, N\right)$
-        \State $z_n \sim \textsc{Bernoulli}\left(1 - B_n\left(\theta^{\left(i - 1\right)}\right)/L_n\left(\theta^{\left(i-1\right)}\right)\right) $ \label{algo:firefly:z}
+        \State $z_n \sim \textsc{Bernoulli}\left(1 - B_n\left(\theta\right)/L_n\left(\theta\right)\right) $ \label{algo:firefly:z}
         \EndFor
-        \State$\theta' \sim g\left(\cdot\mid\theta^{(i-1)}\right)$
+        \State$\theta' \sim g\left(\cdot\mid\theta\right)$
         \State $u\sim \textsc{Uniform}\left(0,1\right)$
-        \If{$\frac{p\left(\theta'\right)\prod_{n=1}^N\left\{ B_n\left(\theta\right) 
-        \left[\frac{L_n\left(\theta'\right)}{B_n\left(\theta'\right)} - 1\right]^{z_n} \right\}
-        g\left(\theta^{\left(i-1\right)}\mid\theta '\right)}{p\left(\theta^{\left(i-1\right)}\right) \prod_{n = 1}^N \left\{B_n\left(\theta^{\left(i-1\right)}\right) 
-     \left[\frac{L_n\left(\theta^{\left(i-1\right)\right)}}
-        {B_n\left(\theta^{\left(i-1\right)}\right)} - 1\right]^{z_n}\right\}
+        \If{$\frac{p\left(\theta'\right)\prod_{n=1}^N B_n\left(\theta'\right) \prod_{n=1}^N \left\{
+        \left[\frac{L_n\left(\theta'\right)}{B_n\left(\theta'\right)} - 1\right]^{z_n}\right\}
+        g\left(\theta\mid\theta '\right)}{p\left(\theta\right) \prod_{n = 1}^N B_n\left(\theta\right) \prod_{n=1}^N
+     \left\{\left[\frac{L_n\left(\theta\right)}
+        {B_n\left(\theta\right)} - 1\right]^{z_n}\right\}
         g\left(\theta' \mid
-        \theta^
-        {\left(i-1\right)}
+        \theta
         \right)}
         > u$} \label{algo:firefly:accept_reject}
         \State $\theta^{\left(i\right)} = \theta '$
         \Else 
-        \State $\theta^{\left(i\right)} = \theta^{\left(i-1\right)}$
+        \State $\theta^{\left(i\right)} = \theta$
          \EndIf
          \EndFor
-         \\
-        \Function{B}{$\theta, x$}
-        \State{\Return }
-        \EndFunction
+
     \end{algorithmic}
 \end{algorithm}
-Algorithm \ref{algo:firefly} is very similar to that of Algorithm \ref{algo:MH}, but instead of evaluating the likelihood of every data point, the likelihood is estimatet using the simpler function $B_n\left(\theta\right)$, where in particluar the product $\prod_{n=1}^N B_n\left(\theta\right)$ is simple to compute. 
+Algorithm \ref{algo:firefly} is very similar to that of Algorithm \ref{algo:MH}, but instead of evaluating the likelihood of every data point, the likelihood is estimated using the simpler function $B_n\left(\theta\right)$, where in particular the product $\prod_{n=1}^N B_n\left(\theta\right)$ is simple to compute.
+\subsection{Recipe for creating a lower bound using Taylor expansions} \label{subsec:taylor_bound_intro}
+To create a Taylor lower bound for application in the Firefly algorithm, one first need to create a Taylor approximation of the log-likelihood up to the desired degree. As known from introductory calculus courses, the Taylor approximation of a function in one real variable $f\left(\theta\right)$ about a point $\theta_{\star}$ to the $n$'th degree, is given by 
+\begin{equation}\label{eq:taylor} 
+\hat{f}\left(\theta\right) = f\left(\theta_{star}\right) + \frac{1}{2} f'\left(\theta_{\star}\right) \left(\theta - \theta_{\star}\right) + \cdots + \frac{1}{n!} f^{\left(n\right)} \left(\theta_{\star}\right) \left(\theta-\theta_{\star}\right)^n,  
+\end{equation}
+
+where $f^{\left(n\right)}\left(\theta_{\star}\right)$ denotes the $n$'th derivative of $f$ evaluated at point $\theta_{\star}$. 
+
+For real, multivariate functions $f\left(\theta\right)$, the Taylor approximation to the function $f$ of order $n$ about the point $\theta_{\star}$ is given by 
+\begin{equation}
+\hat{f}\left(\theta\right) = \sum_{\alpha \leq n} \frac{D^{\alpha}f\left(\theta_{\star}\right)}{\alpha!}\left(\theta - \theta_{\star}\right).   
+\end{equation}
+Where $D^{\alpha} f\left(\theta_{\star}\right)$ is the derivative of order $\alpha$ of the function $f$ evaluated in the point $\theta_{\star}$.  
+
+With a Taylor approximation $\hat{f\left(\theta\right)}$ to estimate the function $f\left(\theta\right)$, the difference $\left|f\left(\theta\right) - \hat{f}\left(\theta\right)\right|$ can be bounded by the Taylor-Lagrange theorem. In the one-dimensional case, the Taylor-Lagrange theorem is stated as follows
+\begin{equation}\label{eq:taylor_lagr}
+|R_n| \leq \frac{M\;|\theta-\theta_{\star}|^{n+1}}{\left(n+1\right)!}
+\end{equation}
+
+Where $M$ satisfies $|f^{\left(n+1\right)}\left(\theta\right)| \leq M$ on some interval $I = \left[a, b\right]$.
+In the multivariate case, the \textbf{Taylor-Lagrange} theorem states
+\todo{Need citation of Taylor-Lagrange for multivariate case. Now, it is written a bit differently from Wikipedia.}
+\begin{equation}\label{eq:taylor_lagr_multivar}
+\mid R_{\beta}\left(\theta\right) \mid \leq\frac{1}{\beta!}\max_{\mid \alpha \mid  = \mid \beta\mid } \max_{\mathbf{\vartheta} \in B}\mid D^{\alpha} f\left(\mathbf{\vartheta}\right)\mid \left(\theta - \theta_{\star}\right)^{\beta}\quad \mathbf{\theta}\in B. 
+\end{equation}
+\todo{Trenger referanse annet enn Wikipedia.. 
+annet symbol for order Taylor expansion?
+Må forklare hva $B$ er. }
+
+In \eqref{eq:taylor_lagr_multivar}, $\beta$ is $n+1$ where $n$ is the order of the Taylor expansion. So the upper bound of the remainder term is determined by the maximal value among the (partial) derivatives up to the order of $\left| \beta\right|$, . \todo{Forklare på en bedre måte?} 
+With a bound on the remainder, we can create a lower bound of $f\left(\theta\right)$: 
+\begin{equation}\label{eq:lower_bound}
+    f\left(\theta\right) \leq \hat{f}\left(\theta\right) - \left|R_n\left(\theta\right)\right|
+\end{equation}. 
+
+
 \subsection{Lower bound for logistic model}
 The logistic regression model has the following likelihood 
 \begin{equation}\label{eq:log_reg}
@@ -91,7 +124,7 @@ The logistic regression model has the following likelihood
 \end{equation}
 where $x_n \in R^d$ is the $n$th data point and $t_n\in \{-1, 1\}$ indicates the class. 
 \cite{Maclaurin:1} and \cite{Bardenet:1} shows two different approaches to finding a lower bound for the logistic regression likelihood, showed in (\ref{eq:log_reg}). 
-Maclaurin suggest using a lower bound for the logistic model from \textbf{Jaakkola and Jordan},  $B_n$ for the likelihood $L_n$ on the following form 
+\cite{Maclaurin:1} suggest using a Jaakkola-Jordan lower bound for the logistic model for the likelihood on the following form 
 \begin{equation}\label{eq:Jakkola_bound}
     \log\left(B_n\left(\theta\right)\right) = a\left(t_n x_n^{\top} \theta\right)^2 + b\left(t_n x_n ^{\top}\theta \right) + c
 \end{equation}
@@ -104,9 +137,9 @@ where $a,b,c$ is defined by
 \end{equation}
 \todo{Skriv mer om dette}
 With $\xi$ the location where the bound $B_n$ should be tight to $L_n$. 
-Bardenet et al. select a different approach using second order Taylor expansions, and then applying the Taylor-Lagrange theorem to bound the remainder. 
-This is a bit more work than calculating the bound in  (\ref{eq:Jakkola_bound}), but this method can be applied to other likelihood functions as well, and thus the Taylor expansion approach is a lot more flexible. As in \cite{Bardenet:1}, we write
-\todo{Her må dimensjonene til matrisene gåes igjennom. Tror ikke formelene er riktige. }
+Bardenet et al. select a different approach using second order Taylor expansions. The procedure of calculating a lower bound using Taylor expansions is shown in chapter \ref{subsec:taylor_bound_intro}. 
+The 
+This is a bit more work than calculating the bound Jaakkola-Jordan bound, but this method can be applied to other likelihood functions as well, and thus the Taylor expansion approach is a lot more flexible, as long as the third derivatives of the log-likelihood exist. As in \cite{Bardenet:1}, we write
 \begin{equation}\label{eq:logist_log_likelihood}
 \ell_n(\theta) = \phi\left(t_n x_n^{\top}\theta \right)
 \end{equation}
@@ -114,7 +147,7 @@ where $\phi(z) = -\log\left( 1  + e^{-z}\right)$ is the log-likelihood of the lo
 \begin{equation}\label{eq:Taylor_exp}
     \hat{\ell}_n\left(\theta\right) = \ell\left(\theta_{\star}\right) + g^T_{n, \star}\left(\theta - \theta_{\star}\right) + \left(\theta - \theta_{\star}\right)^TH_{n, \star}\left(\theta - \theta_{\star}\right)  
 \end{equation}
-where $g_{n, \star}$ is the gradient $\ell_n\left(\theta\right)$ at $\theta_{\star}$ and $H_{n, \star}$ is the Hessian of $\ell_n\left(\theta\right)$ at $\theta_{\star}$.  I.e 
+where $g_{n, \star}$ is the gradient $\ell_n\left(\theta\right)$ at $\theta_{\star}$ and $H_{n, \star}$ is the Hessian of $\ell_n\left(\theta\right)$ at $\theta_{\star}$. The gradient and Hessian for logistic regression are given below. 
 \begin{equation}
 \begin{split}
     g_n\left(\theta\right) &= \frac{\partial\phi\left(t_nx_n^{\top}\theta \right)}{\partial\theta}\\ 
@@ -129,23 +162,20 @@ where $g_{n, \star}$ is the gradient $\ell_n\left(\theta\right)$ at $\theta_{\st
     & = \phi''\left(t_n x_n^{\top} \theta \right) t_n x_n \times \frac{\partial\left(t_nx_n^{\top}\theta \right)}{\partial \theta^T} \\
     & = \phi''\left(t_n x_n^{\top}\theta \right) t_n^2 x_n x_n^{\top} \\
     & = \phi''\left(t_n x_n^{\top}\theta \right)x_n x_n^{\top}
-\end{split}
+\end{split}. 
 \end{equation}
-Where the final equality in \eqref{eq:logist_second_der} is due to $t_n \in \left\{-1, 1\right\}$, so $t_n^2 = 1$. 
-Now, we are close to done with calculating the second order Taylor approximation of $\ell_n\left(\theta\right)$, but we also need to calculate $\phi'\left(t_n x_n^{\top}\theta \right)$ and $\phi''\left(t_n x_n^{\top}\theta \right)$. We simplify the notation by setting $z = t_n\theta x_n^T$. \todo{Fiks ligning under, den er feil. }
+The final equality in \eqref{eq:logist_second_der} is due to $t_n \in \left\{-1, 1\right\}$, so $t_n^2 = 1$. 
+Now, we are close to done with calculating the second order Taylor approximation of $\ell_n\left(\theta\right)$, but we also need to calculate $\phi'\left(t_n x_n^{\top}\theta \right)$ and $\phi''\left(t_n x_n^{\top}\theta \right)$. We simplify the notation by setting $z = t_n\theta x_n^T$. 
 \begin{equation}\label{eq:logist_first_der} 
 \begin{split}
-\phi'\left(z\right) &= \frac{d}{dz} \left( - \log\left(1 + e^z\right)\right)\\ &= - \frac{1}{1 + e^{-z}} \left(-e^{-z}\right) \\
-& = \frac{1}{e^z \left(1+e^{-z}\right)} \\
+\phi'\left(z\right) &= \frac{d}{dz} \left( - \log\left(1 + e^{-z}\right)\right)\\ &= - \frac{1}{1 + e^{-z}} \left(-e^{-z}\right) \\
 & = \frac{1}{e^z + 1}
 \end{split}
 \end{equation}
-\todo{Fiks ligning, den er feil. }
 \begin{equation}\label{eq:loglist_second_der}
     \begin{split}
-       \phi''\left(z\right) & = \frac{d^2}{dz^2}\left(-\log\left(1 + e^z \right)\right) \\
+       \phi''\left(z\right) & = \frac{d^2}{dz^2}\left(-\log\left(1 + e^{-z} \right)\right) \\
         & = \frac{d}{dz} \left(\frac{1}{e^z +1}\right) \\
-        & = \left(-1\right)e^z \left(1 + e^z\right)^{-2} \\
         & = -\frac{e^z}{\left(1 + e^z\right)^2} 
 \end{split} 
 \end{equation}
@@ -183,14 +213,13 @@ We use hyperbolic identities $\tanh(x) =  \frac{e^x - e^{-x}}{e^x + e^{-x}}$ and
 \implies \phi'''(z) = \frac{1}{4}\frac{\tanh(z/2)}{\cosh^2(z/2)} \leq \frac{1}{4}
 \end{split}
 \end{equation}
-Where the final inequality $\phi'''\left(z\right) = \frac{1}{4}\frac{\tanh\left(z/2\right)}{4\cosh^2\left(z/2\right)} \leq \frac{1}{4}$ is due to the \todo{Er dette riktig ord? }\textbf{image} of the $\tanh$- and $\cosh$- functions.
+The final inequality $\phi'''\left(z\right) = \frac{1}{4}\frac{\tanh\left(z/2\right)}{4\cosh^2\left(z/2\right)} \leq \frac{1}{4}$ is due to the image of the $\tanh$- and $\cosh$- functions.
 The image of $\tanh\left(x\right)$ is in $\left(-1, 1\right)$  while the image of $\cosh\left(x\right)$ is in $\left(1, \infty\right)$ the largest possible value if $\frac{\tanh\left(z/2\right)}{\cosh^2\left(z/2\right)}$ is 1, and thus we arrive at the result of \eqref{eq:logist_boundary}.  
 We remember \eqref{eq:Taylor_exp}, and can write 
 \begin{equation}
-    \ell_n\left(\theta\right) = \hat{\ell}_n\left(\theta\right) + R_n 
+    \ell_n\left(\theta\right) = \hat{\ell}_n\left(\theta\right) + R_n, 
 \end{equation}
-Where $\hat{\ell}_n\left(\theta\right)$ is the second order Taylor expansion given in \eqref{eq:Taylor_exp}, and $R_n$ is the error term of the Taylor expansion. Now, we are ready to find the expression for the lower bound of the log-likelihood $b_n\left(\theta\right)$ where $\e^{b_n\left(\theta\right} = B_n\left(\theta\right) > LN\left(\theta\right)$. The third derivatives of the log-likelihood, $\ell_n\left(\theta\right)$ for the logistic regression model is given by \eqref{eq:logist_third_der}, and the upper bound of $\phi''\left(x^T \theta\right)$ is given by \eqref{eq:logist_boundary}. Inserting this into \eqref{eq:taylor_lagr_multivar}, we get
-\todo{fortsett her! Hvor kommer $\mid theta - \theta\mid ^3$ fra? }
+where $\hat{\ell}_n\left(\theta\right)$ is the second order Taylor expansion given in \eqref{eq:Taylor_exp}, and $R_n$ is the error term of the Taylor expansion. Now, we are ready to find the expression for the lower bound of the log-likelihood $b_n\left(\theta\right)$ where $e^{b_n\left(\theta\right)} = B_n\left(\theta\right) < L_n\left(\theta\right)$. The third derivatives of the log-likelihood, $\ell_n\left(\theta\right)$ for the logistic regression model is given by \eqref{eq:logist_third_der}, and the upper bound of $\phi''\left(x^T \theta\right)$ is given by \eqref{eq:logist_boundary}. Inserting this into \eqref{eq:taylor_lagr_multivar}, we get
 \begin{equation}
 \begin{split}
     \mid R_3\left(\theta\right) \mid &\leq \frac{\frac{1}{4}\max_{n=1}^N \lVert x_n^3 \rVert \left(\theta - \theta_{\star}\right)^3}{3!} \\
@@ -198,13 +227,12 @@ Where $\hat{\ell}_n\left(\theta\right)$ is the second order Taylor expansion giv
     \end{split}
 \end{equation}
 
-\todo{Flytt \eqref{eq:taylor_lagr} til en tidligere seksjon. Burde det være egen seksjon? Kanskje i innledning?} Then we can apply (\ref{eq:taylor_lagr}) to find the remainder of the second order Taylor polynomial. 
 \subsection{Lower bound of the Gaussian log-likelihood}
 In \cite{Bardenet:1}, the log-likelihood of the normal distributed data is bounded by a second order Taylor approximation about the maximum likelihood estimate (MLE). i.e. 
 \begin{equation}
-  \hat{\ell}_n = \ell_n(\theta_{\star} ) + g_{n,\star}^T\left(\theta - \theta_{\star}\right) + \frac{1}{2}\left(\theta - \theta_{\star}\right)^T H_{n, \star}\left(\theta - \theta_{\star}\right)
+  \hat{\ell}_n = \ell_n(\theta_{\star} ) + g_{n,\star}^T\left(\theta - \theta_{\star}\right) + \frac{1}{2}\left(\theta - \theta_{\star}\right)^T H_{n, \star}\left(\theta - \theta_{\star}\right),
 \end{equation}
-Where $\theta_{\star}$ is the MLE for $\theta$, $g_{n,\star}$ is the vector of first derivatives w.r.t $\theta$ evaluated in $\theta_{\star}$, and $H_{n, \star}$ is the Hessian evaluated in $\theta_{\star}$. The normal distribution with parameter $\theta = (\mu, \sigma)$  is given by 
+ where $\theta_{\star}$ is the MLE for $\theta$, $g_{n,\star}$ is the vector of first derivatives w.r.t $\theta$ evaluated in $\theta_{\star}$, and $H_{n, \star}$ is the Hessian evaluated in $\theta_{\star}$. The normal distribution with parameter $\theta = (\mu, \sigma)$  is given by 
 \begin{equation}
     L_n(\mu, \sigma) = \frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{\left(x_n-\mu\right)^2}{2\sigma^2}}
 \end{equation}
@@ -228,37 +256,19 @@ Then, the second order Taylor expansion of the log-likelihood about the MLE, $\t
 \begin{equation}
 \begin{split}{}
       \ell_n\left(\theta\right) &= \hat{\ell}_n(\theta) + R(\theta) \\ & = \ell_n\left(\theta_{\star}\right) + \begin{bmatrix} \frac{x_n - \mu_{\star}}{\sigma_{\star}^2}&
--\frac{1}{\sigma_{\star}} + \frac{\left(x_n - \mu_{\star}\right)^2}{\sigma_{\star}^3}\end{bmatrix} \begin{bmatrix} \mu - \mu_{\star} \\   \sigma - \sigma_{\star} \end{bmatrix} \\ &+ \frac{1}{2} \begin{bmatrix} \mu - \mu_{\star} & \sigma - \sigma_{\star} \end{bmatrix} \begin{bmatrix}- \frac{1}{\sigma_{\star}^2} & - 2\frac{\left(x_n - \mu_{\star}\right)}{\sigma_{\star}^3} \\ -2\frac{\left(x_n - \mu_{\star}\right)}{\sigma_{\star}^3} & - \frac{1}{\sigma_{\star}^2} - 3\frac{\left(x_n - \mu_{\star}\right)^2}{\sigma_{\star}^4}\end{bmatrix} \begin{bmatrix} \mu - \mu_{\star} \\   \sigma - \sigma_{\star} \end{bmatrix}   + R(\mu, \sigma)
+-\frac{1}{\sigma_{\star}} + \frac{\left(x_n - \mu_{\star}\right)^2}{\sigma_{\star}^3}\end{bmatrix} \begin{bmatrix} \mu - \mu_{\star} \\   \sigma - \sigma_{\star} \end{bmatrix} \\ &+ \frac{1}{2} \begin{bmatrix} \mu - \mu_{\star} & \sigma - \sigma_{\star} \end{bmatrix} \begin{bmatrix}- \frac{1}{\sigma_{\star}^2} & - 2\frac{\left(x_n - \mu_{\star}\right)}{\sigma_{\star}^3} \\ -2\frac{\left(x_n - \mu_{\star}\right)}{\sigma_{\star}^3} & - \frac{1}{\sigma_{\star}^2} - 3\frac{\left(x_n - \mu_{\star}\right)^2}{\sigma_{\star}^4}\end{bmatrix} \begin{bmatrix} \mu - \mu_{\star} \\   \sigma - \sigma_{\star} \end{bmatrix}   + R(\mu, \sigma), 
 \end{split}
 \end{equation}
- 
-Where $R(\mu, \sigma)$ is the Taylor remainder. 
-To be able to use the second order Taylor expansion about the MLE as a lower bound for the log-likelihood, we need to bound the remainder, using the Taylor-Lagrange theorem.
-Which states that a Taylor expansion of order $n$ has a remainder $R_n$ bounded by the following expression. 
-\begin{equation}\label{eq:taylor_lagr}
-|R_n| \leq \frac{M\;|\theta-\theta_{\star}|^{n+1}}{\left(n+1\right)!}
-\end{equation}
-Where $M$ satisfies $|f_{n+1}\left(x\right)| \leq M$ on some interval $I = \left[a, b\right]$.
-In the multivariate case, the \textbf{Taylor-Lagrange} theorem states
-\todo{Need citation of Taylor-Lagrange for multivariate case. Now, it is written a bit differently from Wikipedia.}
-\begin{equation}\label{eq:taylor_lagr_multivar}
-\mid R_{\beta}\left(\mathbf{x}\right) \mid \leq\frac{1}{\beta!}\max_{\mid \alpha \mid  = \mid \beta\mid } \max_{\mathbf{y} \in B}\mid D^{\alpha} f\left(\mathbf{y}\right)\mid \left(\theta - \theta_{\star)\right)^{\beta}\quad \mathbf{x}\in B. 
-\end{equation}
-\todo{Trenger referanse annet enn Wikipedia.. 
-annet symbol for order Taylor expansion?
-Må forklare hva $B$ er. }
-In \eqref{eq:taylor_lagr_multivar}, $\beta$ is $n+1$ where $n$ is the order of the Taylor expansion. So the upper bound of the remainder term is determined by the maximal value among the (partial) third derivatives. \todo{Forklare på en bedre måte?} 
- We have expanded about $\theta_{\star} = \left(\mu_{\star}, \sigma_{\star}\right)$.
-We \textbf{have} used the second order Taylor expansion to approximate the Gaussian likelihood, so to find the maximal error of the Taylor expansion relative to the true likelihood, we need to calculate the third derivatives of the Gaussian likelihood.  
+where $R(\mu, \sigma)$ is the Taylor remainder. $R\left(\mu, \sigma\right)$ is bounded using \eqref{eq:taylor_lagr_multivar}, which requires that we calculate the third derivative of the log-likelihood:
 \begin{equation*}
 \begin{split}
     \frac{\partial^3 \ell_n\left(\mu, \sigma\right)}{\partial\mu^3} = 0 &, \quad \frac{\partial^3\ell_n\left(\mu, \sigma\right)}{\partial\mu^2\partial \sigma} = \frac{2 }{\sigma^3} \\
-    \frac{\partial^3\ell_n\left(\mu, \sigma\right)}{\partial\mu\partial\sigma^2} = 6\frac{\left(x_n - \mu \right)}{\sigma^4} &, \quad \frac{\partial \ell_n\left(\mu, \sigma\right)}{\partial\sigma^3} = -\frac{2}{\sigma^3} + 12\frac{\left(x_n - \mu\right)^2}{\sigma^5}
+    \frac{\partial^3\ell_n\left(\mu, \sigma\right)}{\partial\mu\partial\sigma^2} = 6\frac{\left(x_n - \mu \right)}{\sigma^4} &, \quad \frac{\partial \ell_n\left(\mu, \sigma\right)}{\partial\sigma^3} = -\frac{2}{\sigma^3} + 12\frac{\left(x_n - \mu\right)^2}{\sigma^5}. 
     \end{split}
 \end{equation*}
-To apply \eqref{eq:taylor_lagr_multivar}, we first have to calculate the maximal \todo{sfdsf}\textbf{function value}.
-For the Gaussian distribution, we get this when $\sigma$ is minimal and \todo{sdfd}$x_n - \mu$ is maximal.
-In both the Firefly algorithm (section \ref{sec:Firefly}) and Bardenet et al.'s confidence sampler (section \ref{sec:conf_sampler}), the Taylor approximation of the likelihood has to be calculated for each iteration in the Markov chain, to approximate the likelihood of the new $\theta'$. 
+Then, in order to apply \eqref{eq:taylor_lagr_multivar}, we have to calculate the maximal third derivative of the log likelihood.
+For the Gaussian distribution, we get this when $\sigma$ is minimal and $x_n - \mu$ is maximal.
+In both the Firefly algorithm Section \ref{sec:Firefly}) and Bardenet et al.'s confidence sampler Section \ref{sec:conf_sampler}), the Taylor approximation of the likelihood has to be calculated for each iteration in the Markov chain, to approximate the likelihood of the new $\theta'$. 
 In that iteration, the minimum possible value of $\sigma$ is $\sigma_{min} = \min\left(\sigma_{MAP}, \sigma', \sigma^{(i-1)}\right) $ where $\sigma'$ is the proposed new $\sigma$-value, $\sigma^{(i-1)}$ is the $\sigma$-value of the previous iteration, and $\sigma_{MAP}$ is the maximum aposteriori estimate. 
 The maximal deviation of the data from the mean value, $\mu$, at iteration $i$ is given by $X_{max} = \max_{n\in 1,\ldots, N} \left(\mid x_n - \mu'\mid, \mid x_n - \mu^{(i-1)}\mid, \mid x_n - \mu_{MAP}\mid\right)$, where $\mu'$ is the proposed value $\mu$ at iteration $i$, $\mu^{(i-1)}$ is the $\mu$-value at the previous iteration, and $\mu_{MAP}$ is the maximum aposteriori estimate of $\mu$. 
 \todo{Relate to algos}
@@ -288,40 +298,59 @@ Where $\psi\left(u, \theta^{(i-1)}, \theta'\right)\coloneqq \frac{1}{N}\log\left
     \begin{algorithmic}[1] % The number tells where the line numbering should start\
         \State $\theta \sim \textsc{InitialDist}$ 
         \For {$i \gets 1 \ldots \textsc{Iters}$}
-        \State$\theta' \sim \theta_{i-1} + \eta$ where $\eta\sim g\left(\cdot \mid \theta_{i-1}\right)$
+        \State $\theta = \theta^{\left(i-1\right)}$ 
+        \State$\theta' \sim \theta + \eta$ where $\eta\sim g\left(\cdot \mid \theta\right)$
         \State $u\sim \textsc{Uniform}\left(0,1\right)$
-        \State $\psi\left(u, \theta_{i-1}, \theta'\right) = \frac{1}{n} \log\left[\frac{u q\left(\theta'\mid \theta_{i-1} \right) p \left(\theta_{i-1}\right)}{q\left(\theta_{i-1} \mid \theta_k \right)p\left(\theta'\right)} \right]$
-        \State $\Lambda_N \left(\theta_{i-1}, \theta'\right) = \frac{1}{n} \sum_{k = 1}^n \log \left[\frac{p\left(x_{k}\mid \theta'\right)}{p\left(x_{k}\mid \theta_{i-1}\right)}\right]$
-        \If{$\Lambda_N\left(\theta_{i-1}, \theta'\right) > \psi \left(u, \theta_{i-1}, \theta'\right)$}
-        \State $\theta_i = \theta'$
+        \State $\psi\left(u, \theta, \theta'\right) = \frac{1}{n} \log\left[\frac{u q\left(\theta'\mid \theta \right) p \left(\theta\right)}{q\left(\theta \mid \theta_k \right)p\left(\theta'\right)} \right]$
+        \State $\Lambda_N \left(\theta, \theta'\right) = \frac{1}{n} \sum_{k = 1}^n \log \left[\frac{p\left(x_{k}\mid \theta'\right)}{p\left(x_{k}\mid \theta\right)}\right]$
+        \If{$\Lambda_N\left(\theta, \theta'\right) > \psi \left(u, \theta, \theta'\right)$}
+        \State $\theta^{\left(i\right)} = \theta'$
         \Else 
-        \State $\theta_i = \theta_{i-1}$
+        \State $\theta^{\left(i\right)} = \theta$
          \EndIf
          \EndFor
     \end{algorithmic}
 \end{algorithm}
-The reason for rewriting Algorithm \ref{algo:MH} to the form of Algorithm \ref{algo:MH_rewritten} is that Bardenet et al. want to use only a subset of the data to make a Monte Carlo estimate of $\Lambda_N\left(\theta_k, \theta'\right)$. 
-i.e. if $X$ is the whole data set, and $X^{\star}$ is a subset of the data set of size $t\leq n$, drawn with uniform probability and without replacement, $\Lambda^{\star}_t = \frac{1}{t} \sum_{i = 1}^t \log\left[\frac{p\left(x_i^{\star}\mid \theta'\right)}{p\left(x_i^{\star}\mid \theta_k\right)}\right]$ is an estimate of $\Lambda_N$.  Then, they use concentration inequalities to find a measure of the precision of the Monte Carlo estimate $\Lambda_t^{\star}$ relative to the true value,  $\Lambda_N$.
+The reason for rewriting Algorithm \ref{algo:MH} to the form of Algorithm \ref{algo:MH_rewritten} is that \cite{Bardenet:2} want to use only a subset of the data to make a Monte Carlo estimate of $\Lambda_N\left(\theta^{\left(k\right)}, \theta'\right)$. 
+i.e. if $X$ is the whole data set, and $X^{\star}$ is a subset of the data set of size $t\leq n$, drawn with uniform probability and without replacement, $\Lambda^{\star}_t = \frac{1}{t} \sum_{i = 1}^t \log\left[\frac{p\left(x_i^{\star}\mid \theta'\right)}{p\left(x_i^{\star}\mid \theta^{\left(k\right)}\right)}\right]$ is an estimate of $\Lambda_N$.  Then, they use concentration inequalities to find a measure of the precision of the Monte Carlo estimate $\Lambda_t^{\star}$ relative to the true value,  $\Lambda_N$.
 A concentration inequality is an inequality on the form 
+
 \begin{equation}\label{eq:concentration}
     P\left(\mid \hat{\theta} - \theta \mid \:\geq \:c\right) \leq 1 - \delta 
 \end{equation}
 Where $\delta$ is chosen by the user, and $c$ is calculated so that \eqref{eq:concentration} is satisfied for that chosen $\delta$.   \\ \\ 
-In this particular situation, \eqref{eq:concentration} is reformulated to 
+In this particular situation, we use Theorem 4.3 of \cite{bardenet2015concentration}, and \eqref{eq:concentration} is reformulated to 
 \begin{equation*}
     P\left(\mid\Lambda_t^{\star}\left(\theta, \theta'\right) - \Lambda_N\left(\theta, \theta'\right)\mid \: \geq \:c_t \right) \leq 1 - \delta_t  
 \end{equation*}{}
-\todo{Jeg bruker Bernstein-Serfling, kan referere til paper av Bardenet} 
-There are several such concentration inequalities one can choose from, but in this thesis, we will use Hoeffding's inequality as presented in \cite{Bardenet:2}, given by 
-\begin{equation}\label{eq:Hoeffding}
-    c_t = C_{\theta, \theta'}\sqrt{\frac{2\left(1 - f_t^{\star}\right)\log\left(2/\delta_t\right)}{t}}
+There are several such concentration inequalities one can choose from, but in this thesis, we will use the empirical Bernstein-Serfling inequality introduced by \cite{bardenet2015concentration}
+This concentration inequality is formulated as 
+\begin{equation}\label{eq:BernsteinSerfling}
+    \frac{\sum_{n = 1}^t \left(\Lambda^{\star}_n - \Lambda_N \right)}{N} \leq \hat{\sigma}_N \sqrt{\frac{2\rho_N\log\left(1/\delta\right)}{N}} + \frac{\kappa \left(b-a\right)\log\left(1 - \delta\right)}{N},
+\end{equation}{}
+where $\kappa = \frac{7}{3} + \frac{3}{\sqrt{2}}$, $\delta$ is equivalent to the $\delta$ in \eqref{eq:concentration}, $a = \min_{1\leq n \leq N} \x_n$, $b= \max_{1 \leq n \leq N} x_n$, 
+\todo{Denne må reformuleres til likelihoods}
+\todo{Jeg har brukt $\kappa$ fra Bardenets github, men i artikkelen står det at $\kappa$ skal være noe annet. }
+\begin{equation}
+    \rho_n =
+    \begin{cases}
+    \left(1 - \frac{n-1}{N}\right) \quad if \quad n \leq N/2\\
+    \left(1  - \frac{n}{N}\right) \left(1 + 1/n\right) \quad if \quad n > N/2
+    \end{cases}
+\end{equation} and $\hat{\sigma}_N$ is the biased estimate of $\sigma$, $\hat{\sigma}_N^2 = \frac{1}{N}\sum_{n=1}^N \left(x_n - \hat{\mu}_N\right)^2$, with $\hat{\mu}_N = \frac{1}{N}\sum_{n=1}^N x_n$.    
+
+
+
+
+%\begin{equation}\label{eq:Hoeffding}
+%    c_t = C_{\theta, \theta'}\sqrt{\frac{2\left(1 - f_t^{\star}\right)\log\left(2/\delta_t\right)}{t}}
+%\end{equation}
+%with 
+%\todo{Skriv om til min notasjon}
+%\begin{equation}\label{eq:concentration_bound}
+%    C_{\theta, \theta'} = \max_{1\leq i \leq n} \lVert \log p\left(x_i \mid \theta'\right) - \log p\left(x_i\mid\theta\right)\rVert
 \end{equation}
-with 
-\todo{Skriv om til min notasjon}
-\begin{equation}\label{eq:concentration_bound}
-    C_{\theta, \theta'} = \max_{1\leq i \leq n} \lVert \log p\left(x_i \mid \theta'\right) - \log p\left(x_i\mid\theta\right)\rVert
-\end{equation}
-As we see from \eqref{eq:concentration_bound}, for this to method to actually reduce the computational cost of the MCMC, it must be possible to compute $C_{\theta, \theta'}$ without evaluating the likelihoods of all points. For normally distributed data with known standard deviation $\sigma$, and unknown mean $\mu$, this is quite simple, as we can see in \cite{Bardenet:2}. The maximum difference in log-likelihood for the proposed parameter and for the current parameter is \todo{forstå hvor 2-tallet kommer fra}. For Gaussian data with both $\mu$ and $\sigma$ unknown, it is still possible to calculate $C_{\theta, \theta'}$ without evaluating all the likelihoods. The log-likelihood ratio for the two-parameter Gaussian is given by
+%As we see from \eqref{eq:concentration_bound}, for this method to actually reduce the computational cost of the MCMC, it must be possible to compute $C_{\theta, \theta'}$ without evaluating the likelihoods of all points. For normally distributed data with known standard deviation $\sigma$, and unknown mean $\mu$, this is quite simple, as we can see in \cite{Bardenet:2}. The maximum difference in log-likelihood for the proposed parameter and for the current parameter is \todo{forstå hvor 2-tallet kommer fra}. For Gaussian data with both $\mu$ and $\sigma$ unknown, it is still possible to calculate $C_{\theta, \theta'}$ without evaluating all the likelihoods. The log-likelihood ratio for the two-parameter Gaussian is given by
 \begin{equation}\label{eq:loglik_diff}
 \begin{split}
     \log \frac{L\left(\mu', \sigma'\right)}{L\left(\mu, \sigma\right)} &= \ell\left(\mu', \sigma'\right) - \ell\left(\mu, \sigma\right) \\
@@ -341,26 +370,10 @@ We differentiate \eqref{eq:loglik_diff} with respect to $x$, and set equal to $0
 Because of the convex form of the log-likelihood ratio, we know that the maximum difference will be at one of the extremes of $x$, i.e. $C_{\theta, \theta'} = \lVert \log p\left(\max\left(x\right)\mid \theta'\right) - p\left(\max\left(x\right)\mid \theta\right)\rVert$, or $C_{\theta, \theta'} = \lVert p\left(\min\left(x\right)\mid \theta'\right) - p\left(\min\left(x\right)\mid \theta\right)\rVert$, where the first will be the case if $\lVert \max\left(x\right) - \frac{\mu\sigma' - \mu'\sigma}{\sigma' - \sigma}\rVert > \lVert \min\left(x\right) - \frac{\mu\sigma' - \mu'\sigma}{\sigma' - \sigma}\rVert$
 and the second will be the case if 
 $\lVert\max\left(x\right) - \frac{\mu\sigma' - \mu'\sigma}{\sigma' - \sigma}\rVert < \lVert \min\left(x\right) - \frac{\mu\sigma' - \mu'\sigma}{\sigma' - \sigma}\rVert$. This becomes clear when we plot the log likelihood ratio as function of $x$ for a given $\theta$ and $\theta'$. 
-\todo{Følgende seksjon er mest ment som kommentar til meg selv på nåværende tidspunkt}
-\subsection{Comment to use of Bernstein-Serfling vs Hoeffding}
-In the supplementary material, \cite{Bardenet:1} use what they call the Bernstein-Serfling bound, suggested in \cite{bardenet2015concentration}. This concentration inequality is formulated as 
-\begin{equation}
-    \frac{\sum_{n = 1}^N \left(x_n - \mu\right)}{N} \leq \hat{\sigma}_N \sqrt{\frac{2\rho_N\log\left(1/\delta\right)}{N}} + \frac{\kappa \left(b-a\right)\log\left(1 - \delta\right)}{N},
-\end{equation}{}
-where $\kappa = \frac{7}{3} + \frac{3}{\sqrt{2}}$, $\delta$ is equivalent to the $\delta$ in \eqref{eq:concentration}, $a = \min_{1\leq n \leq N} x_n$, $b= \max_{1 \leq n \leq N}$, 
-\todo{Denne må reformuleres til likelihoods}
-\begin{equation}
-    \rho_n =
-    \begin{cases}
-    \left(1 - \frac{n-1}{N}\right) \quad if \quad n \leq N/2\\
-    \left(1  - \frac{n}{N}\right) \left(1 + 1/n\right) \quad if \quad n > N/2
-    \end{cases}
-\end{equation}
-One issue with this bound compared to the Hoeffding bound of \eqref{eq:Hoeffding}, is to compute $a$ and $b$, without having to compute all the likelihoods. 
-\subsection{}
+In the following figures, we have plotted the log-likelihood ratio for the Normal distribution, for given values of $\theta$ and $\theta'$ as function of $x$.   
 \begin{figure}[H]
     \centering
-    \includegraphics[scale = 0.6]{figures/loglik_ratio1.pdf}
+    \includegraphics[scale = 0.6, height=13cm]{figures/loglik_ratio1.pdf}
     \caption{Log-likelihood ratio for $\theta = \left(0.05, 1\right)$, $\theta' = \left(0, 0.95\right)$  with $x \sim \mathcal{N}\left(0,1\right)$}
     \label{fig:loglik_ratio_gaussian}
 \end{figure}
@@ -368,20 +381,13 @@ For a logistic regression model with parameters $\beta_0$ and $\beta_1$, the lik
 \begin{equation}\label{eq:logist_likelihood}
 \begin{split}
     L\left(\beta_0, \beta_1\right) &= p\left(x_i\right)^{y_i} \left(1 - p\left(x_i\right)\right)^{1-y_i} \\
-    &= \left(\frac{1}{1 +  e^{-\beta0 -\beta_1 x_i}}\right)^{y_i} \left(1 +  \frac{1}{1 +  e^{-\beta0 -\beta_1 x_i}}\right)^{1 - y_i}. 
+    &= \left(\frac{1}{1 +  e^{-\beta0 -\beta_1 x_i}}\right)^{y_i} \left(1 +  \frac{1}{1 -  e^{-\beta0 -\beta_1 x_i}}\right)^{1 - y_i}. 
 \end{split}
 \end{equation}
 Thus we have log-likelihood 
 \begin{equation}\label{eq:logist_loglik_example}
-\begin{split}
-   \ell\left(\beta_0, \beta_1\right) &=  y_i\log\left(\frac{1}{1+e^{-\beta_0 - \beta_1x_i}}\right) + \left(1 -y_i\right) \log \left(1 - \frac{1}{1 + e^{-\beta_0 - \beta_1x_i}}\right)\\
-    &= y_i\log\left(\frac{1}{1+e^{-\beta_0 - \beta_1 x_i}}\right) + \log\left(1 - \frac{1}{1 + e^{-\beta_0 - \beta_1x_i}}\right) - y_i\log\left(1 - \frac{1}{1 + e ^{-\beta_0 - \beta_1 x_i}}\right) \\
-    & = y_i \log\left(\frac{\frac{1}{1+e^{-\beta_0 - \beta_1x_i}}}{-\left(1 - \frac{1}{1+e^{-\beta_0 - \beta_1 x_i}}\right)}\right) + \log \left(1 - \frac{1}{1 + e^{-\beta_0  -\beta_1 x_i}}\right)
-    \\& = y_i\log\left(e^{\beta_0  +\beta_1 x_i }\right) + \log \left(1 - \frac{1}{1 + e^{-\beta_0 - \beta_1 x_i}}\right) \\
-    & = y_i\left(\beta_0  +\beta_1 x_i\right) + \log \left(1 - \frac{1}{1 + e^{-\beta_0 - \beta_1 x_i}}\right) \\ 
-    &= y_i\left(\beta_0 + \beta_1 x_i \right) + \log \left(\frac{1}{1 + e^{\beta_0 + \beta_1 x_i}}\right) = y_i\left(\beta_0 + \beta_1 x_i \right) - \log \left( 1 + e^{\beta_0  + \beta_1 x_i }\right)
-    \end{split}
-\end{equation}{}
+   \ell\left(\beta_0, \beta_1\right) =   y_i\left(\beta_0 + \beta_1 x_i \right) - \log \left( 1 + e^{\beta_0  + \beta_1 x_i }\right)
+   \end{equation}
 Thus the log-likelihood ratio is given by 
 \begin{equation}
 \begin{split}
@@ -422,7 +428,7 @@ We differentiate the log of the likelihood ratio with respect to $x_i$ to find t
     \centering
     \includegraphics[scale = 0.7]{figures/loglik_ratio_logist2.pdf}
     \caption{Log-likelihood ratio for $\theta = \left(\beta_0, \beta_1\right) = \left(0.95, 2.0\right), \theta' = \left(1.05, 2.2\right)$}
-    \label{fig:my_label}
+    \label{fig:loglik_ratio_logistic2}
 \end{figure}{
 A function on the form $ax + b$ is both convex and concave \todo{referanse}, while $\log\left(1 + e^x\right)$ is convex \todo{proof}. 
 Thus $\log\left(\frac{1 + e^{\beta_0 + \beta_1 x}}{1 + e^{\beta_0' + \beta_1'x}}\right) = \log\left(1 + e^{\beta_0 + \beta_1}\right) - \log\left(1+ e^{ \beta_0' + \beta_1'x}\right)$ is convex if 
@@ -452,9 +458,9 @@ For simple linear regression, the log-likelihood ratio is given by
 We plot this log-likelihood ratio as a function of $y$ to see how it behaves. 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale = 0.7]{figures/loglik_ratio2.pdf}
-    \caption{Caption}
-    \label{fig:my_label}
+    \includegraphics[scale = 0.7, height = 13]{figures/loglik_ratio2.pdf}
+    \caption{The }
+    \label{fig:loglik_ratio_linear_regression}
 \end{figure}{}
 \todo{Paragraph about calculation of $c$, and how to do it in a smarter way}
 Then, the difference between the estimate and the true value can be controlled, and it is this knowledge of the precision of the estimate that is utilized to limit the required computational power.
@@ -501,7 +507,7 @@ Then, by Boole's inequality
 \begin{split}
        P\left(\epsilon^c\right) &= P\left(\cup_{t\geq 1} \left\{\mid\Lambda_N\left(\theta, \theta'\right)- \Lambda_t^{\star}\left(\theta, \theta'\right) \mid \leq c_t\right\}^c\right) \\
     1 - P\left(\epsilon\right) &\leq \sum_{t\geq 1} P\left(\left(\mid \Lambda_N\left(\theta, \theta'\right) - \Lambda_t^{\star}\left(\theta, \theta'\right) \mid \leq c_t \right)^c\right) \\ 
-    1 - P\left(\epsilon\right) &\leq \sum_{t\geq 1} 1 - \left(1 - \delta_t\right) \\
+    1 - P\left(\epsilon\right) &\leq \sum_{t\geq 1} \left(1 - \left(1 - \delta_t\right)\right) \\
     P\left(\epsilon\right) &\geq 1 - \sum_{t\geq 1} \delta_t \geq 1 - \delta.  
 \end{split}
 \end{equation}
@@ -646,7 +652,7 @@ Using (\ref{eq:Hoeffdings}), they can control the maximum probability of making 
        \State $\theta = \theta^{\left(i-1\right)}$
        \State $\theta' \sim q\left(\cdot|\theta\right)$
        \State $u \sim \mathcal{U}\left(0,1\right)$
-       \State$\psi\left(u, \theta, \theta'\right) = \frac{1}{n}\log\left[u\frac{p\left(\theta\right)q\left(\theta'\mid \theta\right)}{p\left(\theta'\right)q\left(\theta \mid\theta'\right)}\right]$
+       \State$\psi\left(u, \theta, \theta'\right) = \frac{1}{N}\log\left[u\frac{p\left(\theta\right)q\left(\theta'\mid \theta\right)}{p\left(\theta'\right)q\left(\theta \mid\theta'\right)}\right]$
        \State $t = 0$
        \State $t_{look} = 0$
        \State $\Lambda^{\star} = 0$
@@ -660,9 +666,9 @@ Using (\ref{eq:Hoeffdings}), they can control the maximum probability of making 
        \State $t = b$
        \State $c = c_t\left(\delta_{t_{look}}\right)$
        \State $t_{look} = t_{look} + 1$
-       \State $b = n\wedge \lceil \gamma t \rceil$
-       \If{$|\Lambda^{\star} - \psi\left(u, \theta,\theta'\right) | \geq c \OR t = n$}\label{confidence:break_while}
-       \State $\textsc{DONE} = \textsc{TRUE}$
+       \State $b = N\wedge \lceil \gamma t \rceil$
+       \If{$|\Lambda^{\star} - \psi\left(u, \theta,\theta'\right) | \geq c \OR b = N$}\label{confidence:break_while}
+       \State $\textsc{DONE} = \textsc{TRUE}$ \label{algo_state:confidence_test}
        \EndIf
        \EndWhile
        \If{$\Lambda^{\star} > \psi\left(u, \theta, \theta'\right)$}
@@ -676,90 +682,4 @@ Using (\ref{eq:Hoeffdings}), they can control the maximum probability of making 
     \end{algorithmic}
 \end{algorithm}
 \todo{skriv mer}
-\section{Quiroz et al. 2019}
-\cite{quiroz2019speeding} suggest adding control variates to the naive subsampling method to control the variance of the log-likelihood ratio. They use a Taylor expansion about the parameter space in addition to a Taylor expansion about the nearest centroid in data space. The centroid in data space is calculateted using the clustering algorithm given below. 
-\todo{Kan ikke kalle data for $z$}
-\begin{algorithm}
-\caption{Data clustering}
-\label{algo:clustering}
-\begin{algorithmic}[1]
-    \Function{clustering}{$x, y, \epsilon$}
-    \State $z_i \gets \left(y_i, x_i\right)^T$
-    \State $z \gets \left(z_1^T, \ldots z_n^T\right)^T $
-    \State $I \gets \left(0, \ldots, 0\right)^T$ 
-    \State $\left(j,k\right) \gets \left(0,0\right)$
-    \While{$\sum I_j \neq N$}
-    \If{$I_j = 0$}
-    \State $C_k \gets \left\{i; \lVert z_j - z_i \rVert \leq \epsilon\right\}  $
-    \State $N_k = \left| C_k\right|$ 
-    \State $z^{c_k} = \frac{1}{N_k} \sum_{i\in C_k} z_i$
-    \State $I_{c_k} \gets 1$
-    \State $k\gets k+1$
-    \EndIf
-    \State $j \gets j+1$
-    \EndWhile
-    \State $K\gets k$
-    \State \textbf{return}$\left\{z^{c_k}\right\}_{k = 1}^K, \; \left\{C_k\right\}_{k=1}^K$
-    \EndFunction
-    \end{algorithmic}
-\end{algorithm}{}
-After clustering the data as described by Algorithm \ref{algo:clustering}, \cite{quiroz2019speeding} make a Taylor approximation of the log-likelihood $\ell_i\left(z_i;\theta\right)$ $q\left(z_i, \theta\right)$ about the centroid of the cluster that $z_i$ belongs to.  
-\begin{equation}
-    q_{i, n}\left(\theta\right) = q\left(z_i;\theta\right) = \ell\left(z^c, \theta\right) + \nabla_z \ell\left(z^c; \theta\right)^T \left(z_i - z^c \right) + \frac{1}{2}\left(z_i - z^c\right)^T H\left(z^c;\theta\right)\left(z_i - z^c\right)
-\end{equation}
-With $H\left(z^c; \theta\right)$ the Hessian evaluated at $z^c$. 
-They define $d_{i, n} = \ell_i\left(\theta\right) - q_{i,n}\left(\theta\right)$ and 
-\begin{equation*}
-\begin{split}
-    \mu_{d,n}\left(\theta\right) &\coloneqq \frac{1}{n}\sum_{i = 1}^n d_{i,n}\left(\theta\right) \\
-    \sigma_{d,n} &\coloneqq \frac{\sum_{i=1}^n\left(d_{i,n}\left(\theta\right) - \mu_{d,n}\left(\theta\right)\right)^2}{n}
-\end{split}
-\end{equation*}{}
-the mean and variance of $\left\{d_{i,n}\left(\theta\right)\right\}_{i=1}^k$. Next, they let $u_1, \ldots, u_m$ be iid random variables with $Pr\left(u = k\right) = \frac{1}{n}$ for $k = 1, \ldots n$, i.e. $u_1, \ldots, u_m$ is a $m$-sized sample of the numbers between $1$ and $n$ with equal probability of each number. \todo{with replacement, right?} 
-Then they define the \textbf{difference estimator} of $\ell_n\left(\theta\right)$
-\begin{equation}
-    \hat{\ell}_{\left(m,n\right)}\coloneqq q_{\left(n\right)}\left(\theta\right) + n\hat{\mu}_{d,n}\left(\theta\right) 
-\end{equation}
-where 
-\begin{equation*}
-    \hat{\mu}_{d,n}\left(\theta\right) = \frac{1}{m}\sum_{i=1}^m d_{u_i,n}\left(\theta\right)
-\end{equation*}{}
-and 
-\begin{equation*}
-    q_{\left(n\right)} \coloneqq \sum_{i=1}^n q_{i,n}\left(\theta\right).
-\end{equation*}
-\todo{forstå hvorfor de presenterer Lemma 1}
-They also suggest an estimate of $\sigma_{d,n}^2\left(\theta\right)$
-\begin{equation}
-    \hat{\sigma}_{d,n}^2\left(\theta\right) \coloneqq \frac{\sum_{i = 1}^m \left(d_{u_i, n}\left(\theta\right) - \hat{\mu}_{d,n}\left(\theta\right)\right)^2}{m} 
-\end{equation}
 
-\todo{rewrite following}
-They propose using an unbiased estimator $\ell_{m,n}\left(\theta\right)$ of the log-likelihood, and then bias-correcting it to obtain the approximately bias-corrected likelihood estimator
-\begin{equation}
-   \hat{L}_{m,n}\left(\theta, u\right) \coloneqq \exp\left(\hat{\ell}\left(\theta\right) - \frac{n^2}{2m}\hat{\sigma}_{d,n}^2\left(\theta\right)\right)
-\end{equation}
-with $p_{\Theta}\left(\theta\right)$ as the prior, and the likelihood $L_{\left(n\right)}\left(\theta\right)$, the \textbf{marginal likelihood} is given by $\overline{L}_{\left(n\right)}\left(\theta\right) = \int_{\Theta} L_{\left(n\right)}\left(\theta\right)p_{\Theta}\left(\theta\right) d\theta$. 
-Then the posterior $\overline{\pi}_n\left(\theta\right) = L_{\left(n\right)}p_{\Theta}\left(\theta\right)/\overline{L}_{\left(n\right)}\left(\theta\right)$. 
-They define $p_U\left(u\right)$ as the distribution of the vector auxiliary variables $u$. 
-Then $\hat{L}_{\left(m,n\right)}\left(\theta\right)$, a possibly biased estimator of $L_{\left(n\right)}\left(\theta\right)$, has expectation 
-\begin{equation}
-    L_{\left(m,n\right)}\left(\theta\right) = \int_U \hat{L}_{\left(m,n\right)}\left(\theta, u\right) p_U\left(u\right) du 
-\end{equation}
-and 
-\begin{equation}
-    \overline{\pi}_{\left(m,n\right)} \left(\theta, u\right) \coloneqq \hat{L}_{\left(m,n\right)}\left(\theta, u\right)p_{\Theta}\left(\theta\right)p_U\left(u\right)/\overline{L}_{\left(m,n\right)}.
-\end{equation}
-With proposal distribution
-\begin{equation}
-    q_{\Theta, u}\left(\theta', u'\mid \theta, u\right) = p_U\left(u\right)q_{\Theta}\left(\theta'\mid \theta\right)
-\end{equation}
-Then the resulting acceptance probability $\alpha$ is given by 
-\begin{equation}
-    \alpha = \min\left(1, \frac{\hat{L}_{\left(m,n\right)}\left(\theta', u'\right)p_{\Theta}\left(\theta'\right)p_U\left(u'\right)q_{\Theta}\left(\theta\mid \theta'\right)}{\hat{L}_{\left(m,n\right)}\left(\theta, u\right)p_{\Theta}\left(\theta\right)p_U\left(u\right)q_{\Theta}\left(\theta'\mid \theta\right)}\right)
-\end{equation}
-since the propability $p_U\left(u = k\right) = 1/n \forall u$, the terms $p_U\left(u'\right)$ and $p_U\left(u\right)$ cancel, and we get 
-\begin{equation}\label{eq:accept_prob_quiroz}
-      \alpha = \min\left(1, \frac{\hat{L}_{\left(m,n\right)}\left(\theta', u'\right)p_{\Theta}\left(\theta'\right)q_{\Theta}\left(\theta\mid \theta'\right)}{\hat{L}_{\left(m,n\right)}\left(\theta, u\right)p_{\Theta}\left(\theta\right)q_{\Theta}\left(\theta'\mid \theta\right)}\right)
-\end{equation}
-\cite{quiroz2019speeding} points out that an MH-sampler with \eqref{eq:accept_prob_quiroz} as acceptance probability, will have stationary distribution $\overline{\pi}_{\left(m,n\right)}\left(\theta\right)$ as stationary distribution, which is equal to $\pi_{\left(n\right)}\left(\theta\right)$ if $\hat{L}_{\left(m,n\right)}\left(\theta, u\right)$ is an unbiased estimator of $L_{\left(n\right)}\left(\theta\right)$.

@@ -1,21 +1,125 @@
 \chapter{Discussion and conclusion}
-In this thesis, we have performed experiments of statistical inference using subsampling methods for Markov Chain Monte Carlo. As we saw in chapter \ref{chap:method}, the Firefly Monte Carlo, Bardenet et al. 2014 subsampler and Bardenet et al. 2017 subsampler all have the correct posterior distribution as its invariant distribution, unlike the naive subsampler. The conservation of the correct posterior distribution is a crucial feature of a subsampling method, \todo{setning?} as inference will not be correct if the invariant distribution of the Markov chain is not the posterior distribution of the parameters. 
+In this thesis, we have performed experiments of statistical inference using subsampling methods for Markov Chain Monte Carlo. As we saw in chapter \ref{chap:method}, the Firefly Monte Carlo, Bardenet et al. 2014 subsampler and Bardenet et al. 2017 subsampler all have the correct posterior distribution as its invariant distribution, unlike the naive subsampler. The conservation of the correct posterior distribution is a crucial feature of a subsampling method, \todo{setning?} as inference will not be correct if the invariant distribution of the Markov chain is not the posterior distribution of the parameters. In this chapter we will discuss the results of the algorithms that were tested in Chapter \ref{chap:experiments}. 
 
-As we saw in chapter \ref{sec:Firefly}, the Firefly algorithm is quite simple to implement. As long as it is possible to create a lower bound for the likelihood function, the Firefly Monte Carlo method can be applied. A lower bound may be a Taylor approximation about some starting value $\theta^{}\left(0\right)$.  Taylor approximations are bounded by the Taylor-Lagrange theorem given in  \eqref{eq:taylor_lagr} and \eqref{eq:taylor_lagr_multivar}. Thus, it is simple to create such a lower bound as long as the derivatives up to the order needed in the Taylor-Lagrange theorem. Lower bounds can also be made in other ways, i.e. as in  \cite{Maclaurin:1} with Jaakola and Jordan lower bound. In the experiments section of this thesis, Chapter \ref{chap:experiments}, we have only considered lower bounds in form of the Taylor expansion, but it could be interesting to compare the performance of the Firefly method using different lower bounds for the likelihood.
+\section{Firefly}
+As we saw in chapter \ref{sec:Firefly}, the Firefly algorithm is quite simple to implement. As long as it is possible to create a lower bound for the likelihood function, the Firefly Monte Carlo method can be applied. A lower bound may be a Taylor approximation about some starting value $\theta^{\left(0\right)}$.  Taylor approximations are bounded by the Taylor-Lagrange theorem given in  \eqref{eq:taylor_lagr} and \eqref{eq:taylor_lagr_multivar}. Thus, it is simple to create such a lower bound as long as the derivatives up to the order needed in the Taylor-Lagrange theorem. Lower bounds can also be made in other ways, i.e. as in  \cite{Maclaurin:1} with Jaakola and Jordan lower bound. In the experiments section of this thesis, Chapter \ref{chap:experiments}, we have only considered lower bounds in form of the Taylor expansion, but it could be interesting to compare the performance of the Firefly method using different lower bounds for the likelihood.
 
 As we saw from the tables \ref{tab:ll_evals_10k}, \ref{tab:ll_evals_50k}, \ref{tab:ll_evals_100k}, \ref{tab:multiple_evals_10k}, \ref{tab:multiple_evals_50k} and \ref{tab:multiple_evals_100k},  the number of  likelihood evaluations, for the Firefly method is strongly dependent on the the initial value of $\theta$, i.e. the point of which the Taylor expansion is made about.
-Here, one may argue that some of the $\theta^{\left(0\right)}$ were extremely far from the true value. In simple cases, such as logistic regression, one could use an optimization algorithm, like \texttt{optim} or used the \texttt{glm}-function to get good approximations of the parameters. 
-However, in more complex cases, it may not be possible to get good approximations from these methods, and the starting values may be far from the true value. 
+Here, one may argue that some of the $\theta^{\left(0\right)}$ were extremely far from the true value. In simple cases, such as logistic regression, one could use an optimization algorithm, like \texttt{optim} or used the \texttt{glm}-function, both R-functions,to obtain good approximations of the parameters. 
+However, in more complex cases, it may not be possible to obtain good approximations from these methods, and the starting values may be far from the true value. 
 Thus we thought it was interesting to see how the methods were affected by bad starting values. 
 
  
-For $\theta^{\left(0\right)}$ far from the true $\theta$, the number of likelihood evaluations is essentially the same as as the Metropolis-Hastings algorithm.
+For $\theta^{\left(0\right)}$ far from the true $\theta$, the number of likelihood evaluations is essentially the same as the Metropolis-Hastings algorithm.
 Considering that the Firefly algorithm in addition to calculating the likelihood evaluations has to calculate the lower bounds of the likelihood evaluations, there is clearly no computational gain of using the Firefly algorithm in this situation.
 
-From the tables referenced above, we see that for $\theta^{\left(0\right)}$ close to the true $\theta$, on the other hand,  the number of likelihood evaluations is reduced considerably compared to the number for the Metropolis-Hastings algorithm. 
+On the other hand, from the tables referenced above, we see that for $\theta^{\left(0\right)}$ close to the true $\theta$,the number of likelihood evaluations is reduced considerably compared to the number for the Metropolis-Hastings algorithm. 
 This can also be seen in tables \ref{tab:ll_evals_10k_normal}, \ref{tab:ll_evals_50k_normal} and \ref{tab:ll_evals_100k_normal}, where all $\theta^{\left(0\right)}$ are close to the true $\theta$. Just looking at the values from the tables, one could think that the Firefly algorithm may be the answer to reduce the cost of MCMC sampling, at least when we are certain that $\theta^{\left(0\right)}$ is close to the true $\theta$. 
 
-However, there are other factors to consider when assessing the quality of the method. First, looking at the densities of figures \ref{fig:chain_10k_04_06_normal}, \ref{fig:chain_10k_20_06} and  \ref{fig:chain_50k_20_06}, we see estimated posterior densities from the Firefly method is not 
+However, there are other factors to consider when assessing the quality of the method. First, looking at the densities of figures \ref{fig:chain_10k_04_06_normal}, \ref{fig:chain_10k_20_06}, \ref{fig:chain_50k_20_06} and \ref{fig:density_50k_02_06_theta3}, we see estimated posterior densities from the Firefly algorithm are slightly shifted compared to the densities of the Metropolis-Hastings.
+In particular, the estimated densities of the Firefly algorithm seems to be more different from the other densities for runs where $\theta^{\left(0\right)}$ is close to the true $\theta$. 
+
+The reason why the resulting estimated posterior densities of the Firefly algorithm is shifted compared to the Metropolis-Hastings is obvious when looking at Figure
+\ref{fig:autocorrelation_10k_04_06_normal}\ref{fig:autocorrelation_10k_02_06}, \ref{fig:autocorrelation_50k_02_06} and  \ref{fig:autocorrelation_50k_02_06_theta3}. The autocorrelation of the Firefly chains is large compared to the autocorrelation of the other algorithms. The large autocorrelation is visible in the plot of the Firefly chain for logistic regression in Figure \ref{fig:compare_theta1}.B. This large autocorrelation is due to only a few bright data points at each iteration, and that a flip from bright to dark or vice versa is rare. The high autocorrelation leads to slow mixing of the chain. The results we got from the experiments using the Firefly algorithm are in accordance with the results of \cite{Bardenet:1}.  
+
+\section{Bardenet et al. confidence sampler 2014}
+For normally distributed data, we saw approximately a halving of likelihood evaluations for the confidence sampler compared to the Metropolis-Hastings, see tables \ref{tab:ll_evals_10k_normal}, \ref{tab:ll_evals_50k_normal}, \ref{tab:ll_evals_100k_normal}. Based on the information in these tables, we see that the number of likelihood evaluations does not seem to be very affected by $\theta^{\left(0\right)}$. Unlike the Firefly algorithm, the confidence sampler does not have a problem with autocorrelation, as we see from figures \ref{fig:autocorrelation_10k_04_06_normal} and \ref{fig:autocorrelation_50k_04_06_normal}. However, we estimated posterior distribution of the confidence sampler is shifted compared to the estimated posterior distribution of $\sigma$ from that of the Metropolis-Hastings algorithm in figures \ref{fig:density_10k_04_06_normal} and \ref{fig:density_50k_04_06_normal}. 
 
 
+The experiments of the Bardenet et al. 2014 confidence sampler have not been very successful in the experiments presented in Chapter \ref{chap:experiments}. Looking at the tables of likelihood evaluations \ref{tab:ll_evals_10k}, \ref{tab:ll_evals_50k}, \ref{tab:ll_evals_100k}, \ref{tab:multiple_evals_10k}, \ref{tab:multiple_evals_50k} and  \ref{tab:multiple_evals_100k}, we see that the number of likelihood evaluations is almost the same, regardless of $\theta^{\left(0\right)}$, and exactly the same in \ref{tab:multiple_evals_10k}, \ref{tab:multiple_evals_50k}, \ref{tab:multiple_evals_100k}. The reason for this, we believe to be the Bernstein-Serfling bound not being tight enough. Actually, it may seem like the number of likelihood evaluation of the confidence sampler in \ref{sec:experiments_multiple_log_reg} is the maximum possible number of likelihood evaluations for the confidence sampler. The reason why this number still is smaller than the number of likelihood evaluations for the Metropolis-Hastings is clear from Algorithm \ref{algo:conf_sampl} and line \ref{algo_state:confidence_test}. Since $b$ increases geometrically, and is updated in the end of while-loop, the included number of samples in the batch when the while-loop is exited will always be smaller than the number of data points $N$. For better performance, it should not be the condition $b = N$ that breaks the while-loop, but $\mid \Lambda
+^{\star}- \psi\left(u, \theta, \theta'\right)\mid \geq c$. It seems that the concentration bound is the issue here, as we tested with other concentration bounds, Bernstein, Hoeffding and Hoeffding-Serfling, all suggested in \cite{bardenet2015concentration}. The other concentration bounds seemed to be too \textit{tight}, as the resulting number of likelihood evaluations only was the minimum possible number of likelihood evaluations. Here, we think it would be interesting to perform experiments with different values of $\delta$ for the concentration bounds, to get a sufficiently tight bound. 
 
+Aside from the problem of the concentration bound being too tight or not tight enough, there is another problem with the confidence sampler that limits its applications.
+This limitation is there must be a bound $C_{\theta, \theta'} =  \max_{n=1}^N\left\mid \log\left[\frac{p\left(x_n\mid \theta'\right)}{p\left(x_n\mid \theta\right)}\right]\right\mid$,
+and most importantly, the $C_{\theta, \theta'}$ must be possible to compute without having to compute the likelihoods of all the data. As we see from figures \ref{fig:loglik_ratio_gaussian}, \ref{fig:loglik_ratio_logistic} and \ref{fig:loglik_ratio_logistic2}, the likelihood ratios for the normal distribution and logistic regression behaves nicely. For these models, we can calculate $C_{\theta, \theta'}$ only by calculation of the extreme values of $x$. However, for the linear regression model, we see by Figure \ref{fig:loglik_ratio_linear_regression}, that it may be difficult to calculate $C_{\theta, \theta'}$ without having to evaluate the likelihood for many data points. If it is necessary to evaluate the likelihood of all the data points at every iteration to find the correct $C_{\theta, \theta'}$, there is no computational gain of using the confidence sampler compared to the Metropolis-Hastings 
+
+\section{Bardenet et al. confidence sampler 2017}
+
+
+\section{Quiroz et al. 2019}
+\cite{quiroz2019speeding} suggest adding control variates to the naive subsampling method to control the variance of the log-likelihood ratio. They use a Taylor expansion about the parameter space in addition to a Taylor expansion about the nearest centroid in data space. The centroid in data space is calculated using the clustering algorithm given below. 
+\todo{Kan ikke kalle data for $z$}
+\begin{algorithm}
+\caption{Data clustering}
+\label{algo:clustering}
+\begin{algorithmic}[1]
+    \Function{clustering}{$x, y, \epsilon$}
+    \State $z_i \gets \left(y_i, x_i\right)^T$
+    \State $z \gets \left(z_1^T, \ldots z_n^T\right)^T $
+    \State $I \gets \left(0, \ldots, 0\right)^T$ 
+    \State $\left(j,k\right) \gets \left(0,0\right)$
+    \While{$\sum I_j \neq N$}
+    \If{$I_j = 0$}
+    \State $C_k \gets \left\{i; \lVert z_j - z_i \rVert \leq \epsilon\right\}  $
+    \State $N_k = \left| C_k\right|$ 
+    \State $z^{c_k} = \frac{1}{N_k} \sum_{i\in C_k} z_i$
+    \State $I_{c_k} \gets 1$
+    \State $k\gets k+1$
+    \EndIf
+    \State $j \gets j+1$
+    \EndWhile
+    \State $K\gets k$
+    \State \textbf{return}$\left\{z^{c_k}\right\}_{k = 1}^K, \; \left\{C_k\right\}_{k=1}^K$
+    \EndFunction
+    \end{algorithmic}
+\end{algorithm}{}
+After clustering the data as described by Algorithm \ref{algo:clustering}, \cite{quiroz2019speeding} make a Taylor approximation of the log-likelihood $\ell_i\left(z_i;\theta\right)$ $q\left(z_i, \theta\right)$ about the centroid of the cluster that $z_i$ belongs to.  
+\begin{equation}
+    q_{i, n}\left(\theta\right) = q\left(z_i;\theta\right) = \ell\left(z^c, \theta\right) + \nabla_z \ell\left(z^c; \theta\right)^T \left(z_i - z^c \right) + \frac{1}{2}\left(z_i - z^c\right)^T H\left(z^c;\theta\right)\left(z_i - z^c\right)
+\end{equation}
+With $H\left(z^c; \theta\right)$ the Hessian evaluated at $z^c$. 
+They define $d_{i, n} = \ell_i\left(\theta\right) - q_{i,n}\left(\theta\right)$ and 
+\begin{equation*}
+\begin{split}
+    \mu_{d,n}\left(\theta\right) &\coloneqq \frac{1}{n}\sum_{i = 1}^n d_{i,n}\left(\theta\right) \\
+    \sigma_{d,n} &\coloneqq \frac{\sum_{i=1}^n\left(d_{i,n}\left(\theta\right) - \mu_{d,n}\left(\theta\right)\right)^2}{n}
+\end{split}
+\end{equation*}{}
+the mean and variance of $\left\{d_{i,n}\left(\theta\right)\right\}_{i=1}^k$. Next, they let $u_1, \ldots, u_m$ be iid random variables with $Pr\left(u = k\right) = \frac{1}{n}$ for $k = 1, \ldots n$, i.e. $u_1, \ldots, u_m$ is a $m$-sized sample of the numbers between $1$ and $n$ with equal probability of each number. \todo{with replacement, right?} 
+Then they define the \textbf{difference estimator} of $\ell_n\left(\theta\right)$
+\begin{equation}
+    \hat{\ell}_{\left(m,n\right)}\coloneqq q_{\left(n\right)}\left(\theta\right) + n\hat{\mu}_{d,n}\left(\theta\right) 
+\end{equation}
+where 
+\begin{equation*}
+    \hat{\mu}_{d,n}\left(\theta\right) = \frac{1}{m}\sum_{i=1}^m d_{u_i,n}\left(\theta\right)
+\end{equation*}{}
+and 
+\begin{equation*}
+    q_{\left(n\right)} \coloneqq \sum_{i=1}^n q_{i,n}\left(\theta\right).
+\end{equation*}
+\todo{forstå hvorfor de presenterer Lemma 1}
+They also suggest an estimate of $\sigma_{d,n}^2\left(\theta\right)$
+\begin{equation}
+    \hat{\sigma}_{d,n}^2\left(\theta\right) \coloneqq \frac{\sum_{i = 1}^m \left(d_{u_i, n}\left(\theta\right) - \hat{\mu}_{d,n}\left(\theta\right)\right)^2}{m} 
+\end{equation}
+
+\todo{rewrite following}
+They propose using an unbiased estimator $\ell_{m,n}\left(\theta\right)$ of the log-likelihood, and then bias-correcting it to obtain the approximately bias-corrected likelihood estimator
+\begin{equation}
+   \hat{L}_{m,n}\left(\theta, u\right) \coloneqq \exp\left(\hat{\ell}\left(\theta\right) - \frac{n^2}{2m}\hat{\sigma}_{d,n}^2\left(\theta\right)\right)
+\end{equation}
+with $p_{\Theta}\left(\theta\right)$ as the prior, and the likelihood $L_{\left(n\right)}\left(\theta\right)$, the \textbf{marginal likelihood} is given by $\overline{L}_{\left(n\right)}\left(\theta\right) = \int_{\Theta} L_{\left(n\right)}\left(\theta\right)p_{\Theta}\left(\theta\right) d\theta$. 
+Then the posterior $\overline{\pi}_n\left(\theta\right) = L_{\left(n\right)}p_{\Theta}\left(\theta\right)/\overline{L}_{\left(n\right)}\left(\theta\right)$. 
+They define $p_U\left(u\right)$ as the distribution of the vector auxiliary variables $u$. 
+Then $\hat{L}_{\left(m,n\right)}\left(\theta\right)$, a possibly biased estimator of $L_{\left(n\right)}\left(\theta\right)$, has expectation 
+\begin{equation}
+    L_{\left(m,n\right)}\left(\theta\right) = \int_U \hat{L}_{\left(m,n\right)}\left(\theta, u\right) p_U\left(u\right) du 
+\end{equation}
+and 
+\begin{equation}
+    \overline{\pi}_{\left(m,n\right)} \left(\theta, u\right) \coloneqq \hat{L}_{\left(m,n\right)}\left(\theta, u\right)p_{\Theta}\left(\theta\right)p_U\left(u\right)/\overline{L}_{\left(m,n\right)}.
+\end{equation}
+With proposal distribution
+\begin{equation}
+    q_{\Theta, u}\left(\theta', u'\mid \theta, u\right) = p_U\left(u\right)q_{\Theta}\left(\theta'\mid \theta\right)
+\end{equation}
+Then the resulting acceptance probability $\alpha$ is given by 
+\begin{equation}
+    \alpha = \min\left(1, \frac{\hat{L}_{\left(m,n\right)}\left(\theta', u'\right)p_{\Theta}\left(\theta'\right)p_U\left(u'\right)q_{\Theta}\left(\theta\mid \theta'\right)}{\hat{L}_{\left(m,n\right)}\left(\theta, u\right)p_{\Theta}\left(\theta\right)p_U\left(u\right)q_{\Theta}\left(\theta'\mid \theta\right)}\right)
+\end{equation}
+since the propability $p_U\left(u = k\right) = 1/n \forall u$, the terms $p_U\left(u'\right)$ and $p_U\left(u\right)$ cancel, and we get 
+\begin{equation}\label{eq:accept_prob_quiroz}
+      \alpha = \min\left(1, \frac{\hat{L}_{\left(m,n\right)}\left(\theta', u'\right)p_{\Theta}\left(\theta'\right)q_{\Theta}\left(\theta\mid \theta'\right)}{\hat{L}_{\left(m,n\right)}\left(\theta, u\right)p_{\Theta}\left(\theta\right)q_{\Theta}\left(\theta'\mid \theta\right)}\right)
+\end{equation}
+\cite{quiroz2019speeding} points out that an MH-sampler with \eqref{eq:accept_prob_quiroz} as acceptance probability, will have stationary distribution $\overline{\pi}_{\left(m,n\right)}\left(\theta\right)$ as stationary distribution, which is equal to $\pi_{\left(n\right)}\left(\theta\right)$ if $\hat{L}_{\left(m,n\right)}\left(\theta, u\right)$ is an unbiased estimator of $L_{\left(n\right)}\left(\theta\right)$.

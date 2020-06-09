@@ -89,26 +89,36 @@ If a Markov chain satisfy the conditions of irreducibility, recurrency and aperi
 \begin{equation*}
     \pi_j = \lim_{t\rightarrow{}\infty} P\left(\theta^{\left(t\right)} = j \mid \theta^{\left(0\right)} = i \right) =  \sum_{i \in A} \pi_i P\left(\theta^{\left(n\right)} = j \mid \theta^{\left(n-1\right)} = i\right)
 \end{equation*}
-\todo{Dette er for kontinuerlig tilfelle}
 \subsection{Continuous case}
 Often, we want to simulate samples from a continuous distribution using MCMC. In these cases, continuous Markov models are needed, and so the definitions in section \ref{subsec:markov_discrete} are not sufficient. 
-In order to have the Markov chain converge to the stationary distribution, we need some conditions that must be satisfied \cite{MCMC_in_pract}. 
-In the general case, irreducibility is defined with respect to a distribution. 
-We let $E$ denote the state space, \textbf{which must satisfy some conditions}, and $\tau_A$ denote the number of steps until the first return of a Markov chain to a set $A\subset E$.  
+In order to have the Markov chain converge to the stationary distribution, we need continuous equivalents to irreducibility, recurrence and aperiodicity. The definitions \ref{def:gen_irr}, \ref{def:cont_recurrence} and \ref{def:cont_aperiodicity} given below are taken from \cite{MCMC_in_pract}. 
+In the general case, irreducibility is defined with respect to a distribution $p$. 
+We let $E$ denote the state space. According to \cite{MCMC_in_pract}, the only requirement on $E$ is that the collection $\epsilon$ of subsets $E$ on which the distribution $p$ is defined, must be a countably generated $\sigma$-algebra.  $\tau_A$ denote the number of steps until the first return of a Markov chain to a set $A\subset E$.  
 $\tau_A = \inf\left\{n\geq 1 : X_n \in A\right\}$. If the chain never returns to $A$, $\tau_A = \infty$.
 \begin{definition}{\textsc{Irreducibility}}\label{def:gen_irr}
-   A Markov chain is $\phi$-irreducible for a probability distribution $\phi$ on $E$ if $\phi\left(A\right) > 0$ for a set $A\subset E$ implies that $$P_x\left\{\tau_A < \infty\right\} > 0$$ for all $x\in E$ a chain is irreducible if it is $\phi$-irreducible for some probability distribution $\phi$. If a chain is $\phi$-irreducible, then $\phi$ is called an irreducibility distribution for the chain. 
+   A Markov chain is $\phi$-irreducible for a probability distribution $\phi$ on $E$ if $\phi\left(A\right) > 0$ for a set $A\subset E$ implies that $$P_x\left\{\tau_A < \infty\right\} > 0$$ for all $x\in E$. A chain is irreducible if it is $\phi$-irreducible for some probability distribution $\phi$. If a chain is $\phi$-irreducible, then $\phi$ is called an irreducibility distribution for the chain. 
 \end{definition}
-From definition \ref{def:gen_irr}, we see that the \textbf{probability of the chain to return to set $A$ is positive}.  
+In Definition \ref{def:gen_irr}, $P_x$ is the probabilities for a Markov chain started with $X^{\left(0\right)} = x$. $P_x$ is the probabilities for a Markov chain started with $X^{\left(0\right)} = x$. 
+
 For the next definition, we need to define the term \textit{maximal irreduciblity distribution}. If a Markov chain is irreducible, it can be shown that it has a distribution $\psi$, called the maximal irreducibility distribution, where all other irreducibility distributions are absolutely continuous with respect to $\psi$.  
-\begin{definition}{\textsc{Recurrence}}
+\begin{definition}{\textsc{Recurrence}}\label{def:cont_recurrence}
 An irreducible Markov chain with maximal irreducibility distribution $\psi$ is recurrent if for any set $A\subset E$ with $\psi\left(A\right)>0$ the conditions
 $$(i)\quad P_x \left\{X_n \in A \; \textit{infinitely often}\right\} > 0\quad \textit{for all}\; x$$ 
 $$(ii) \quad P_x\left\{X_n\in A \; \textit{infinitely often} \right\} = 1 \quad \textit{for}\;\psi \textit{-almost all} \; x$$
 are both satisfied. An irreducible recurrent chain is positive recurrent if it has an invariant probability distribution.
 Otherwise it is null recurrent. 
 \end{definition}
-If a continous Markov chain satisfy the conditions of irreducibility, recurrency and aperiodicity, then there exists a unique distribution $\left(p\left(\theta\right)$ \todo{Er det greit å bruke $\left(\theta\right)$ her? }  
+\begin{definition}{\textsc{Aperiodicity}}\label{def:cont_aperiodicity}
+   An m-cycle for an irreducible chain with transition kernel
+p is a collection $\left\{ E_0, ... , E_{m-1}\right\}$ of disjoint sets such that $p(x, Ej) = 1$ for
+$j = i + 1 \mod m$ and all $x \in E_i$. The period $d$ of the chain is the largest $m$
+for which an $m$-cycle exists. The chain is aperiodic if $d = 1$.
+\end{definition}
+
+
+
+
+If a continuous Markov chain satisfy the conditions of irreducibility, recurrency and aperiodicity, then there exists a unique distribution $p\left(\theta\right)$ \todo{Er det greit å bruke $\left(\theta\right)$ her? }  
 \begin{equation*}
 \lim_{t\xrightarrow{}\infty}p\left(\theta^{(t)}\in A\mid \theta^{(0)} = x\right) = \int_{A} f\left(y\right) dy
 \end{equation*}
@@ -118,13 +128,17 @@ where $f\left(x\right)$ is what we call the stationary distribution of the Marko
 \end{equation}In our case, we want the stationary distribution $f(x)$ be the posterior distribution, so we need to find a transition density  $P\left(y\mid x\right)$ that satisfies (\ref{eq:MCstationary}). This may be difficult, but \textit{detailed balance} is a sufficient criterion for (\ref{eq:MCstationary}). \todo{referanse/bevis}
 \theoremstyle{definition}
 \begin{definition}{\textsc{Detailed Balance}} \label{def:detailed_balance}
-   $ f(y)P\left(y\mid x\right) = f(x)P\left(x\mid y\right)$
+   $ p\left(\theta'\right)p\left(\theta'\mid \theta\right) = p\left(\theta\right)p\left(\theta\mid \theta'\right)$
 \end{definition}
-So a Markov chain with transition density $P\left(x\mid y\right)$ that satisfies (\ref{def:detailed_balance}) will have $f$ as stationary distribution. 
-\textbf{What about aperiodicity?}
+So a Markov chain with transition density $P\left(\theta\mid \theta'\right)$ that satisfies \eqref{def:detailed_balance} will have $p$ as stationary distribution. 
+\cite{MCMC_in_pract}, 
+
+
+
+
 \section{Markov Chain Monte Carlo}
 MCMC are  methods used to sample from a distribution close to the posterior when it is difficult to sample from the true posterior. As mentioned in section \ref{sec:bayesian}, 
-doing inference when the prior $p\left(\theta\right)$ is not a conjugate distribution of the likelihood $f\left(x ; \theta\right)$ can be very difficult.
+doing inference when the prior $p\left(\theta\right)$ is not a conjugate distribution of the likelihood $L\left(\theta\right)$ can be very difficult.
 Instead of evaluating the true posterior directly, we approximate it by drawing values of $\theta$ from an approximate distribution. 
 As we saw in  section \ref{sec:markov}, an irreducible, recurrent, aperiodic Markov chain has a unique stationary distribution $f(x)$.
 In the context of Markov Chain Monte Carlo, we want to construct a Markov chain in such a way that the stationary distribution of the Markov chain is the posterior distribution that we are interested in. 
@@ -149,27 +163,27 @@ Then the Gelman-Rubin statistic is defined as
 \begin{equation}\label{eq:Gelman-Rubin}
     R = \frac{\left[\left(L-1\right)/L\right]W + \left(1/L\right)B}{W}
 \end{equation}
-\todo{"Both the numerator and the denominator should estimate the marginal variance of $X$}
-The value of $\sqrt{R} \xrightarrow{} 1$ as $L \xrightarrow{} \infty$, so if $\sqrt{R}$ is sufficiently close to 1, it is an indication that the size of the burn-in, $D$ and the length of the chain $L$ both are sufficiently large. However, according to \cite{CS}, $R$ the numerator of \eqref{eq:Gelman-Rubin} is a bit to large, and the denominator is a bit to small, so in practice, an adjusted statistic $\hat{R}$ is often used, where
+
+The value of $\sqrt{R} \xrightarrow{} 1$ as $L \xrightarrow{} \infty$ as both the numerator and the denominator should estimate the marginal variance of $\theta$. If $\sqrt{R}$ is sufficiently close to 1, it is an indication that the size of the burn-in, $D$ and the length of the chain $L$ both are sufficiently large. However, according to \cite{CS}, $R$ the numerator of \eqref{eq:Gelman-Rubin} is a bit to large, and the denominator is a bit to small, so in practice, an adjusted statistic $\hat{R}$ is often used, where
 \begin{equation}\label{eq:Gelman-Rubin_adjusted}
     \hat{R} = \frac{J+1}{J}R - \frac{L-1}{JL} 
 \end{equation}
 A value $\sqrt{\hat{R}}<1.1$ is said to indicate that both $D$ and $L$ are sufficiently large.
-The transition kernel, $P\left(\theta, \Theta\right)$, of a Markov chain is a probability distribution function conditional on the current state $\theta$ that gives the probability of moving to a new state $\theta'$ in the parameter space $\Theta$ \cite{chib1995understanding}. The transition kernel is the continuous case equivalent to the transition matrix. \todo{Skulle endre noe her, men hva? } For MCMC, we have to find a transition kernel that is such that the invariant distribution of the chain is $\pi\left(\theta\right)$, the distribution of interest. 
 
 \subsection{MCMC with auxiliary variables}
 The idea of using auxiliary variables in MCMC methods has existed for some time. 
 \cite{Besag} suggested using auxiliary variables for tackling multimodal posteriors.
 With $\theta$ as parameter of interest, and $z$ some auxiliary variable, they have $p\left(\theta\right)$ the (marginal) distribution of interest, and $p\left(z\mid\theta\right)$ the conditional distribution of $z$ given $x$. 
-Then, with $\pi\left(\theta, z\right) = \pi\left(\theta\right)\pi\left(z\mid\theta\right)$ 
-First drawing $z$ from $p\left(z\mid \theta\right)$, then drawing $\theta'$ from $\pi\left(\theta\mid z\right)$ as part of one iteration of the MCMC, preserves $p\left(\theta\right)$ as a stationary distribution. 
+Then, with $\pi\left(\theta, z\right) = \pi\left(\theta\right)\pi\left(z\mid\theta\right)$, they construct a two-step Markov chain that by  
+first drawing $z$ from $p\left(z\mid \theta\right)$, then drawing $\theta'$ from $\pi\left(\theta\mid z\right)$ as part of one iteration of the MCMC, preserves $p\left(\theta\right)$ as a stationary distribution. 
 $$p\left(\theta\mid z\right) = \frac{p\left(\theta\right) p\left(z\mid\theta\right)}{p\left(z\right)}$$
 Using such auxiliary variables has shown to have benefits in various applications. 
-As we can read in \cite{Besag}, the method of auxiliary variables has, as an example, proven to be particularly useful in physics research through the Swendsen-Wang algorithm, 
-\\ \\ In section \ref{sec:Firefly}, we will see such auxiliary variables used in combination with subsampling of data.
+As we can read in \cite{Besag}, the method of auxiliary variables has, as an example, proven to be particularly useful in physics research through the Swendsen-Wang algorithm. 
+
+In section \ref{sec:Firefly}, we will see such auxiliary variables used in combination with subsampling of data.
 \subsection{MCMC with delayed rejection}
 Delayed rejection is a method used in MCMC to avoid the chain of getting stuck in a restricted area of the target distribution. As \cite{mira2001metropolis} argues, if the chain is restricted to only a part of the state space not only will it fail in exploring the full state space, but the in-chain correlation will also be large. 
-Because of this, the parameter estimates obtained from a MCMC by averaging over the chain will not be as effective in the case where the chain might get stuck.  i.e. the estimates will have a higher variance, than when the chain is able to \textbf{move} over the full state space.
+Because of this, the parameter estimates obtained from a MCMC by averaging over the chain will not be as effective in the case where the chain might get stuck.  i.e. the estimates will have a higher variance, than when the chain is able to move over the full state space.
 A larger probability of accepting the candidate will reduce the problem of the restricted chain. 
 As a method of increasing the acceptance probability, \cite{mira2001metropolis} suggests different forms of delayed rejection. One of the suggested mechanisms is to draw a new proposal for that certain iteration, and not progress to the next iteration until some proposed candidate has been accepted. 
 They also suggest variants of this method, like progressing to the next iteration after the second rejection, or progressing to the next iteration with some probability $p$ after the second rejection, otherwise continue drawing a new proposal. 
