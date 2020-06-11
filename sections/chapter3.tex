@@ -216,8 +216,8 @@ In this experiment, we have sampled $\sigma$ on a log-scale, and adjusted the pr
     \qquad
     \subfloat[D]{\includegraphics[scale=0.3, page = 3]{figures/Normal/confidence_w_pr_compared1.pdf}}%
     \caption{All plots A-D shows a Metropolis-Hastings chain, chain 1, plotted together with one other method. In Figure \ref{fig:compare_theta1}.A, chain 2 is the naive subsampler. In Figure\ref{fig:compare_theta1}.B, chain 2 is the Firefly, Figure \ref{fig:compare_theta1}.C is the Bardenet et al. 2014 subsampler and Figure \ref{fig:compare_theta1}.D is the Bardenet et al. 2017 subsampler. $\theta
-   ^{\left(0\right)} = \left(-0.2, -0.05)$}%
-    \label{fig:compare_theta1_normal}%
+   ^{\left(0\right)} ig:= \left(-0.2, -0.05\right)$}%
+    \label{fig:compare_tfheta1_normal}%
 \end{figure}
 
 
@@ -260,29 +260,7 @@ Compared to the simulations from the Metropolis-Hastings algorithm, we see from 
 \section*{Results}
 We have implemented the Firefly Monte Carlo method, and tried logistic regression on simulated data, as described in section \ref{subsec:data} using both a regular MH-sampler as well as the Firefly Monte Carlo. 
 We have also tried logistic regression on two of the classes \textbf{which classes} from MNIST data set \textbf{reference} where we calculate the principal components and use these as explanatory variables for the regression, as demonstrated in \cite{Maclaurin:1}. 
-\subsection{New plots}
-Here we present some plots to illustrate the differences between the different methods we presented in \textbf{the previous chapter}. 
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale = 0.7, page = 3]{figures/test.pdf}
-    \caption{Caption}
-    \label{fig:my_label}
-\end{figure}{}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale = 0.7, page = 4]{figures/test.pdf}
-    \caption{Caption}
-    \label{fig:my_label}
-\end{figure}{}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale = 0.7, page = 6]{figures/test.pdf}
-    \caption{Caption}
-    \label{fig:my_label}
-\end{figure}{}
-\section{Logistic regression}\label{sec:log_reg_experiments}
 \subsection{Confidence sampler with proxy}
 As we saw in \ref{sec:adap_subsampl}, we need a proxy $\powerset_i\left(\theta, \theta'\right)$ with $$\powerset_i\left(\theta, \theta'\right) \approx \ell_i\left(\theta'\right) - \ell_i\left(\theta\right). $$   
 We will use a second order Taylor expansion as the proxy, i.e 
@@ -470,9 +448,9 @@ So one of the $\theta^{\left(0\right)}$ is far from the true value of $\theta = 
     \subfloat[C]{\includegraphics[scale=0.3, page = 3]{figures/ComparisonLogistic/confidence_compared2.pdf}}%
     \qquad
     \subfloat[D]{\includegraphics[scale=0.3, page = 3]{figures/ComparisonLogistic/confidence_w_proxy_compared2.pdf}}%
-    \caption{All plots A-D shows a Metropolis-Hastings chain, chain 1, plotted together with one other method. In Figure \ref{fig:compare_theta1}.A, chain 2 is the naive subsampler. In Figure\ref{fig:compare_theta1}.B, chain 2 is the Firefly, Figure \ref{fig:compare_theta1}.C is the Bardenet et al. 2014 subsampler and Figure \ref{fig:compare_theta1}.D is the Bardenet et al. 2017 subsampler. $\theta
+    \caption{All plots A-D shows a Metropolis-Hastings chain, chain 1, plotted together with one other method. In Figure \ref{fig:compare_theta2}.A, chain 2 is the naive subsampler. In Figure\ref{fig:compare_theta2}.B, chain 2 is the Firefly, Figure \ref{fig:compare_theta2}.C is the Bardenet et al. 2014 subsampler and Figure \ref{fig:compare_theta2}.D is the Bardenet et al. 2017 subsampler. $\theta
    ^{\left(0\right)} = \left(0.9,1.8\right)$}%
-    \label{fig:compare_theta1}%
+    \label{fig:compare_theta2}%
 \end{figure}
 
 
@@ -486,7 +464,7 @@ So one of the $\theta^{\left(0\right)}$ is far from the true value of $\theta = 
     \qquad
     \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 2]{figures/50k_iterations_02_06_theta4.pdf}}%
     \caption{Posterior densities for all methods, with different starting values for $\theta$.  }%
-    \label{fig:chain_50k_20_06}%
+    \label{fig:density_50k_02_06}%
 \end{figure}
 
 
@@ -500,7 +478,7 @@ So one of the $\theta^{\left(0\right)}$ is far from the true value of $\theta = 
     \qquad
     \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 3]{figures/50k_iterations_02_06_theta4.pdf}}%
     \caption{Simulated values of $\beta_1$ and $\beta_2$ through the 10000 iterations, with a $20\%$ burn-in}%
-    \label{fig:density_50k_02_06}%
+    \label{fig:chain_50k_02_06}%
 \end{figure}
 
 
@@ -612,7 +590,7 @@ With many parameters, there is a lot to plot, so here, we chose to only display 
     \subfloat{ 
     \includegraphics[scale=0.4, page = 4]{figures/multiple_logistic_regression/50k_iterations/02_06_theta1.pdf}}%
     \caption{Estimated posterior densities for all methods, with $\theta^{\left(0\right)} = \mathbf{0}$}%
-    \label{fig:density_50k_02_06}%
+    \label{fig:density_50k_02_06_theta1}%
 \end{figure}
 
 
@@ -624,7 +602,7 @@ With many parameters, there is a lot to plot, so here, we chose to only display 
     \subfloat{
     \includegraphics[scale=0.4, page = 6]{figures/multiple_logistic_regression/50k_iterations/02_06_theta1.pdf}}%
     \caption{Simulated values of the $\beta$'s through the iterations with a $20\%$ burn-in $\theta^{\left(0\right)} = \mathbf{0}$}%
-    \label{fig:chain_50k_02_06}%
+    \label{fig:chain_50k_02_06_theta1}%
 \end{figure}
 
 \begin{figure}%
@@ -635,7 +613,7 @@ With many parameters, there is a lot to plot, so here, we chose to only display 
     \subfloat{
     \includegraphics[scale=0.4, page = 12]{figures/multiple_logistic_regression/50k_iterations/02_06_theta1.pdf}}%
     \caption{Autocorrelation for all methods, $20\%$ burn-in $\theta^{\left(0\right)} = \mathbf{0}$}%
-    \label{fig:autocorrelation_50k_02_06}%
+    \label{fig:autocorrelation_50k_02_06_theta1}%
 \end{figure}
 
 \subsubsection{$\theta^{\left(0\right)} = \mathbf{1}$}
