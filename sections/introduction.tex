@@ -42,7 +42,7 @@ One benefit of Bayesian inference is that it often seems more intuitive than the
 Despite having many benefits, there are some critics of Bayesian statistics. One of which is the concern that the use of prior introduces subjectivity in the inference, as the statistician has to chose prior herself\cite{gelman2008objections}.
 Another problem with Bayesian statistics, is that it is often computationally costly.
 As we have discussed, the prior in (\ref{eq:Bayes}), $p\left(\theta\right)$ is known, as the statistician chose it herself. The likelihood $L\left(\theta, y\right)$ is known when the data is given and we know its distribution given the parameters.
-The problem is the denominator, $f\left(y\right)$, which is the marginal distribution of the data. This is especially a problem when the prior is not of a conjugate class of the likelihood. 
+The problem is the denominator, $f\left(y\right)$, which is the marginal distribution of the data. In particular, this is a problem when the prior is not of a conjugate class of the likelihood. 
 \begin{equation}\label{eq:marginal}
     p\left(y\right) = \int_{\Theta}p\left(y,\theta\right) d\theta = \int_{\Theta} p\left(\theta\right)L\left(\theta, y\right) d\theta
 \end{equation}
@@ -143,7 +143,7 @@ Instead of evaluating the true posterior directly, we approximate it by drawing 
 As we saw in  section \ref{sec:markov}, an irreducible, recurrent, aperiodic Markov chain has a unique stationary distribution $f(x)$.
 In the context of Markov Chain Monte Carlo, we want to construct a Markov chain in such a way that the stationary distribution of the Markov chain is the posterior distribution that we are interested in. 
 \subsection{Convergence of Markov chain to stationary distribution}\label{sec:convergence}
-When a Markov chain with the desired invariant distribution is constructed, one must also ensure that the chain converges to that invariant distribution and find the correct size of the burn-in, $D$, and an appropriate number of iterations $D+L$. There exist several  methods to evaluate convergence, but in this thesis, we will use Gelman-Rubin statistic to ensure that the chain is sufficiently close to the invariant distribution. The idea of the Gelman-Rubin diagnostic method is to run a number of parallel chains, $J$, and compare the within-chain variance of chain $j$ with the out of chain variance \cite{CS}. The within-chain variance of the is defined as 
+When a Markov chain with the desired invariant distribution is constructed, one must also ensure that the chain converges to that invariant distribution and find the correct size of the burn-in, $D$, and an appropriate number of iterations $D+L$. Several such methods to evaluate convergence exist, but in this thesis, we will use Gelman-Rubin statistic to ensure that the chain is sufficiently close to the invariant distribution. The idea of the Gelman-Rubin diagnostic method is to run a number of parallel chains, $J$, and compare the within-chain variance of chain $j$ with the out of chain variance \cite{CS}. The within-chain variance of the is defined as 
 \begin{equation*}
     s_j^2 = \frac{1}{L-1}\sum_{t = D}^{D + L - 1} = \left(\theta_j^{\left(t\right)} - \bar{\theta}_j\right)^2
 \end{equation*}
@@ -164,7 +164,7 @@ Then the Gelman-Rubin statistic is defined as
     R = \frac{\left[\left(L-1\right)/L\right]W + \left(1/L\right)B}{W}
 \end{equation}
 
-The value of $\sqrt{R} \xrightarrow{} 1$ as $L \xrightarrow{} \infty$ as both the numerator and the denominator should estimate the marginal variance of $\theta$. If $\sqrt{R}$ is sufficiently close to 1, it is an indication that the size of the burn-in, $D$ and the length of the chain $L$ both are sufficiently large. However, according to \cite{CS}, $R$ the numerator of \eqref{eq:Gelman-Rubin} is a bit to large, and the denominator is a bit to small, so in practice, an adjusted statistic $\hat{R}$ is often used, where
+The value of $\sqrt{R} \xrightarrow{} 1$ as $L \xrightarrow{} \infty$ as both the numerator and the denominator should estimate the marginal variance of $\theta$. If $\sqrt{R}$ is sufficiently close to 1, it is an indication that the size of the burn-in, $D$ and the length of the chain $L$ both are sufficiently large. However, according to \cite{CS}, $R$ the numerator of \eqref{eq:Gelman-Rubin} is a bit too large, and the denominator is a bit too small, so in practice, an adjusted statistic $\hat{R}$ is often used, where
 \begin{equation}\label{eq:Gelman-Rubin_adjusted}
     \hat{R} = \frac{J+1}{J}R - \frac{L-1}{JL} 
 \end{equation}
@@ -177,8 +177,8 @@ With $\theta$ as parameter of interest, and $z$ some auxiliary variable, they ha
 Then, with $\pi\left(\theta, z\right) = \pi\left(\theta\right)\pi\left(z\mid\theta\right)$, they construct a two-step Markov chain that by  
 first drawing $z$ from $p\left(z\mid \theta\right)$, then drawing $\theta'$ from $\pi\left(\theta\mid z\right)$ as part of one iteration of the MCMC, preserves $p\left(\theta\right)$ as a stationary distribution. 
 $$p\left(\theta\mid z\right) = \frac{p\left(\theta\right) p\left(z\mid\theta\right)}{p\left(z\right)}$$
-Using such auxiliary variables has shown to have benefits in various applications. 
-As we can read in \cite{Besag}, the method of auxiliary variables has, as an example, proven to be particularly useful in physics research through the Swendsen-Wang algorithm. 
+The use of such auxiliary variables has shown to be beneficial in various applications. 
+As discussed in \cite{Besag}, the method of auxiliary variables has, as an example, proven to be particularly useful in physics research through the Swendsen-Wang algorithm. 
 
 In section \ref{sec:Firefly}, we will see such auxiliary variables used in combination with subsampling of data.
 \subsection{MCMC with delayed rejection}
@@ -200,20 +200,20 @@ The algorithm for MH is given below.
     \caption{Metropolis-Hastings}
     \label{algo:MH}
     \begin{algorithmic}[1] % The number tells where the line numbering should start\
-        \State $\theta \sim \textsc{InitialDist}$ 
+        \State $\theta^{\left(0\right)} \sim \textsc{InitialDist}$ 
         \For {$i \gets 1 \ldots \textsc{Iters}$}
-        \State$\theta' \sim g\left(\cdot \mid \theta^{\left(i-1\right)}\right)$
+        \State $\theta = \theta^{\left(i - 1\right)}$
+        \State$\theta' \sim g\left(\cdot \mid \theta\right)$
         \State $u\sim \textsc{Uniform}\left(0,1\right)$
-        \If{ $\frac{p\left(\theta' \mid \mathbf{x}\right) g\left(\theta^{\left(i-1\right)}\mid \theta'\right)}{p\left(\theta^{\left(i-1\right)}\mid \mathbf{x}\right)g\left(\theta'\mid \theta^{\left(i-1\right)}\right)} > u$}
+        \If{ $\frac{p\left(\theta' \mid \mathbf{x}\right) g\left(\theta \mid \theta'\right)}{p\left(\theta\mid \mathbf{x}\right)g\left(\theta'\mid \theta\right)} > u$}
         \State $\theta^{\left(i\right)} = \theta'$
         \Else 
-        \State $\theta^{\left(i\right)} = \theta^{\left(i-1\right)}$
+        \State $\theta^{\left(i\right)} = \theta$
          \EndIf
          \EndFor
     \end{algorithmic}
 \end{algorithm}
-\todo{Se på notater fra STK4051 hvordan "posterior" forseling uttrykkes der (i algoritmen), vil ha mest mulig generell. }
-In algorithm \ref{algo:MH}, $g\left(\cdot \mid \theta_{i-1}\right)$ is called the proposal distribution of $\theta$. 
+In algorithm \ref{algo:MH}, $g\left(\cdot \mid \theta^{\left(i-1\right)}\right)$ is called the proposal distribution of $\theta$. 
 With MH, we can draw samples from any probability distribution, as long as a function that it is proportional of, i.e. we need to know the numerator in (\ref{eq:Bayes}), but we do not need to know the denominator, $f\left(x\right)$.
 As we saw in section \ref{sec:bayesian}, $f\left(x\right)$ is often difficult to calculate, so this suits us well. 
 We must show that the invariant distribution of the Metropolis-Hastings algorithm actually is the posterior density that we are interested in.

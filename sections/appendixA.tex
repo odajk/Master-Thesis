@@ -1,7 +1,106 @@
-\chapter{The First Appendix}
+\chapter{Traceplots}
 \label{sec:first-app}
-\kant[20-21] % Dummy text
-\section{First Section}
-\kant[22]    % Dummy text
-\section{Second Section}
-\kant[23-24] % Dummy text
+\section{Normal model}
+\begin{figure}%
+   \centering
+    \subfloat[$\theta_{init} = \theta_1$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/10k_04_06_theta1.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_2$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/10k_04_06_theta2.pdf}}%
+    \newline
+    \subfloat[$\theta_{init} = \theta_3$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/10k_04_06_theta3.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/10k_04_06_theta4.pdf}}%
+    \newline
+     \subfloat[$\theta_{init} = \theta_5$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/10k_04_06_theta5.pdf}}%
+    \caption{Chains for all methods, with different starting values for $\theta$.  }%
+    \label{fig:chain_10k_04_06_normal}%
+\end{figure}
+
+
+
+\begin{figure}%
+   \centering
+    \subfloat[$\theta_{init} = \theta_1$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta1.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_2$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta2.pdf}}%
+    \newline
+    \subfloat[$\theta_{init} = \theta_3$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta3.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta4.pdf}}%
+    \newline
+     \subfloat[$\theta_{init} = \theta_5$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta5.pdf}}%
+    \caption{Chains for all methods, with different starting values for $\theta$.  }%
+    \label{fig:chain_50k_04_06_normal}%
+\end{figure}
+
+
+
+\section{Simple logistic regression}
+\begin{figure}%
+    \centering
+    \subfloat[$\theta_{init} = \theta_1$]{\includegraphics[scale=0.3, page = 3]{figures/10k_iterations_02_06_theta1.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_2$]{\includegraphics[scale=0.3, page = 3]{figures/10k_iterations_02_06_theta2.pdf}}%
+    \newline
+    \subfloat[$\theta_{init} = \theta_3$]{\includegraphics[scale=0.3, page = 3]{figures/10k_iterations_02_06_theta3.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 3]{figures/10k_iterations_02_06_theta4.pdf}}%
+    \caption{Simulated values of $\beta_1$ and $\beta_2$ through the 10000 iterations, with a $20\%$ burn-in}%
+    \label{fig:chain_10k_02_06}%
+\end{figure}
+
+
+
+\begin{figure}%
+    \centering
+    \subfloat[$\theta_{init} = \theta_1$]{\includegraphics[scale=0.3, page = 3]{figures/50k_iterations_02_06_theta1.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_2$]{\includegraphics[scale=0.3, page = 3]{figures/50k_iterations_02_06_theta2.pdf}}%
+    \newline
+    \subfloat[$\theta_{init} = \theta_3$]{\includegraphics[scale=0.3, page = 3]{figures/50k_iterations_02_06_theta3.pdf}}%
+    \qquad
+    \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 3]{figures/50k_iterations_02_06_theta4.pdf}}%
+    \caption{Simulated values of $\beta_1$ and $\beta_2$ through the 10000 iterations, with a $20\%$ burn-in}%
+    \label{fig:chain_50k_02_06}%
+\end{figure}
+
+
+\section{Multiple logistic regression}
+
+begin{figure}%
+    \centering
+    \subfloat{
+    \includegraphics[scale=0.4, page = 5]{figures/multiple_logistic_regression/50k_iterations/02_06_theta1.pdf}}%
+    \qquad
+    \subfloat{
+    \includegraphics[scale=0.4, page = 6]{figures/multiple_logistic_regression/50k_iterations/02_06_theta1.pdf}}%
+    \caption{Simulated values of the $\beta$'s through the iterations with a $20\%$ burn-in $\theta^{\left(0\right)} = \mathbf{0}$}%
+    \label{fig:chain_50k_02_06_theta1}%
+\end{figure}
+
+
+
+\begin{figure}%
+    \centering
+    \subfloat{
+    \includegraphics[scale=0.4, page = 5]{figures/multiple_logistic_regression/50k_iterations/02_06_theta2.pdf}}%
+    \qquad
+    \subfloat{
+    \includegraphics[scale=0.4, page = 6]{figures/multiple_logistic_regression/50k_iterations/02_06_theta2.pdf}}%
+    \caption{Simulated values of the $\beta$'s through the iterations with a $20\%$ burn-in $\theta^{\left(0\right)} = \mathbf{1}$}%
+    \label{fig:chain_50k_02_06_theta2}%
+\end{figure}
+
+
+\begin{figure}%
+    \centering
+    \subfloat{
+    \includegraphics[scale=0.4, page = 5]{figures/multiple_logistic_regression/50k_iterations/02_06_theta3.pdf}}%
+    \qquad
+    \subfloat{
+    \includegraphics[scale=0.4, page = 6]{figures/multiple_logistic_regression/50k_iterations/02_06_theta3.pdf}}%
+    \caption{Simulated values of the $\beta$'s through the iterations with a $20\%$ burn-in $\theta^{\left(0\right)} = \theta$}%
+    \label{fig:chain_50k_02_06_theta3}%
+\end{figure}
+
+

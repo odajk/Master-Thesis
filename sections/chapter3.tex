@@ -1,6 +1,6 @@
 \chapter{Experiments}\label{chap:experiments}
 In this section we will test the methods discussed in \ref{sec:second}, and evaluate their performance for different models. We want to investigate whether the methods presented in the previous sections actually perform better in a tall data situation than the regular MH algorithm.  \\
-The methods we have tested are given in the table below 
+The methods we have tested are given in the table below: 
 
 \begin{table}[H]
     \centering
@@ -13,7 +13,7 @@ The methods we have tested are given in the table below
         Logistic regression &V &V &V &V  \\
         Linear regression &V & V& X& X \\ \hline
     \end{tabular}{}
-    \caption{Overview of which models we have tested for the different methods}
+    \caption{Overview of which models we have tested for the different methods. Here V indicates that the model is tested, and X that it is not.}
     \label{tab:experiment_overview}
 \end{table}{}
 We will use the number of required likelihood evaluations before convergence of the chain to the invariant distribution to be a measure of a methods performance.
@@ -121,25 +121,11 @@ In this experiment, we have sampled $\sigma$ on a log-scale, and adjusted the pr
     \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 2]{figures/Normal/10k_04_06_theta4.pdf}}%
     \newline
      \subfloat[$\theta_{init} = \theta_5$]{\includegraphics[scale=0.3, page = 2]{figures/Normal/10k_04_06_theta5.pdf}}%
-    \caption{Estimated posterior densities for all methods, with different starting values for $\theta$.  }%
+    \caption{Estimated posterior densities for all methods, with different starting values for $\theta$. The model is the normal distribution with parameters $\mu$ and $\sigma$, with $\sigma$ plotted on log-scale.}%
     \label{fig:density_10k_04_06_normal}%
 \end{figure}
 
 
-\begin{figure}%
-   \centering
-    \subfloat[$\theta_{init} = \theta_1$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/10k_04_06_theta1.pdf}}%
-    \qquad
-    \subfloat[$\theta_{init} = \theta_2$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/10k_04_06_theta2.pdf}}%
-    \newline
-    \subfloat[$\theta_{init} = \theta_3$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/10k_04_06_theta3.pdf}}%
-    \qquad
-    \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/10k_04_06_theta4.pdf}}%
-    \newline
-     \subfloat[$\theta_{init} = \theta_5$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/10k_04_06_theta5.pdf}}%
-    \caption{Chains for all methods, with different starting values for $\theta$.  }%
-    \label{fig:chain_10k_04_06_normal}%
-\end{figure}
 
 
 \begin{figure}%
@@ -174,20 +160,7 @@ In this experiment, we have sampled $\sigma$ on a log-scale, and adjusted the pr
     \label{fig:density_50k_04_06_normal}%
 \end{figure}
 
-\begin{figure}%
-   \centering
-    \subfloat[$\theta_{init} = \theta_1$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta1.pdf}}%
-    \qquad
-    \subfloat[$\theta_{init} = \theta_2$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta2.pdf}}%
-    \newline
-    \subfloat[$\theta_{init} = \theta_3$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta3.pdf}}%
-    \qquad
-    \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta4.pdf}}%
-    \newline
-     \subfloat[$\theta_{init} = \theta_5$]{\includegraphics[scale=0.3, page = 3]{figures/Normal/50k_04_06_theta5.pdf}}%
-    \caption{Chains for all methods, with different starting values for $\theta$.  }%
-    \label{fig:chain_50k_04_06_normal}%
-\end{figure}
+
 
 
 \begin{figure}%
@@ -217,7 +190,7 @@ In this experiment, we have sampled $\sigma$ on a log-scale, and adjusted the pr
     \subfloat[D]{\includegraphics[scale=0.3, page = 3]{figures/Normal/confidence_w_pr_compared1.pdf}}%
     \caption{All plots A-D shows a Metropolis-Hastings chain, chain 1, plotted together with one other method. In Figure \ref{fig:compare_theta1}.A, chain 2 is the naive subsampler. In Figure\ref{fig:compare_theta1}.B, chain 2 is the Firefly, Figure \ref{fig:compare_theta1}.C is the Bardenet et al. 2014 subsampler and Figure \ref{fig:compare_theta1}.D is the Bardenet et al. 2017 subsampler. $\theta
    ^{\left(0\right)} ig:= \left(-0.2, -0.05\right)$}%
-    \label{fig:compare_tfheta1_normal}%
+    \label{fig:compare_theta1_normal}%
 \end{figure}
 
 
@@ -255,7 +228,6 @@ Compared to the simulations from the Metropolis-Hastings algorithm, we see from 
 
 
 
-\subsection{Linear regression}
 
 \section*{Results}
 We have implemented the Firefly Monte Carlo method, and tried logistic regression on simulated data, as described in section \ref{subsec:data} using both a regular MH-sampler as well as the Firefly Monte Carlo. 
@@ -360,9 +332,9 @@ Based on the tables \ref{tab:ll_evals_10k}, \ref{tab:ll_evals_50k}, and \ref{tab
 
 
 
-\subsection{Plots}
+\section{Plots}
 In all the following plots, the total number of iterations is stated in the header. We used a burn-in of $20\%$, regardless of the number of iterations. 
-\subsubsection{10 000 iterations}
+\subsection{10 000 iterations}
 In the following plots, the numbers 1-4 index the methods in the following way: \\
 \begin{centering}
 $\mathbf{1}$:  Metropolis-Hastings \\
@@ -382,22 +354,10 @@ $\mathbf{4}$: Bardenet et. al 2017 \\
     \qquad
     \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 2]{figures/10k_iterations_02_06_theta4.pdf}}%
     \caption{Posterior densities for all methods, with different starting values for $\theta$.  }%
-    \label{fig:chain_10k_20_06}%
-\end{figure}
-
-
-\begin{figure}%
-    \centering
-    \subfloat[$\theta_{init} = \theta_1$]{\includegraphics[scale=0.3, page = 3]{figures/10k_iterations_02_06_theta1.pdf}}%
-    \qquad
-    \subfloat[$\theta_{init} = \theta_2$]{\includegraphics[scale=0.3, page = 3]{figures/10k_iterations_02_06_theta2.pdf}}%
-    \newline
-    \subfloat[$\theta_{init} = \theta_3$]{\includegraphics[scale=0.3, page = 3]{figures/10k_iterations_02_06_theta3.pdf}}%
-    \qquad
-    \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 3]{figures/10k_iterations_02_06_theta4.pdf}}%
-    \caption{Simulated values of $\beta_1$ and $\beta_2$ through the 10000 iterations, with a $20\%$ burn-in}%
     \label{fig:density_10k_02_06}%
 \end{figure}
+
+
 
 
 \begin{figure}%
@@ -415,7 +375,7 @@ $\mathbf{4}$: Bardenet et. al 2017 \\
 
 
 
-\subsubsection{50 000 iterations}
+\subsection{50 000 iterations}
 We wanted to compare the chains of the naive subsampler, Firefly and the Bardenet et al. 2014 and 2017 methods with the chain from a Metropolis Hastings. We did this for the values of $\theta^{\left(0\right)}$
 \begin{equation*}
 \begin{split}
@@ -468,18 +428,6 @@ So one of the $\theta^{\left(0\right)}$ is far from the true value of $\theta = 
 \end{figure}
 
 
-\begin{figure}%
-    \centering
-    \subfloat[$\theta_{init} = \theta_1$]{\includegraphics[scale=0.3, page = 3]{figures/50k_iterations_02_06_theta1.pdf}}%
-    \qquad
-    \subfloat[$\theta_{init} = \theta_2$]{\includegraphics[scale=0.3, page = 3]{figures/50k_iterations_02_06_theta2.pdf}}%
-    \newline
-    \subfloat[$\theta_{init} = \theta_3$]{\includegraphics[scale=0.3, page = 3]{figures/50k_iterations_02_06_theta3.pdf}}%
-    \qquad
-    \subfloat[$\theta_{init} = \theta_4$]{\includegraphics[scale=0.3, page = 3]{figures/50k_iterations_02_06_theta4.pdf}}%
-    \caption{Simulated values of $\beta_1$ and $\beta_2$ through the 10000 iterations, with a $20\%$ burn-in}%
-    \label{fig:chain_50k_02_06}%
-\end{figure}
 
 
 \begin{figure}%
@@ -503,12 +451,12 @@ Isolated, the reduction in likelihood evaluations is a good thing, as the comput
 The reason why the autocorrelation is so large is due to that only a small proportion of the data points change from dark $z = 0$ to bright $z = 1$ or vice versa, between two iterations. 
 Thus, the likelihood of only a small portion of the data is evaluated at each iteration, and this small portion of data is essentially the same from one iteration to the next. 
 
-\subsubsection{Likelihood evaluations as a function of number of data points}\todo{endre setning}As we saw in the introduction, the computational cost of a traditional MCMC algorithm is proportional to the number of data points. 
+\subsection{Likelihood evaluations as a function of number of data points}\todo{endre setning}As we saw in the introduction, the computational cost of a traditional MCMC algorithm is proportional to the number of data points. 
 The subsampling methods researched in this thesis all try to reduce the computational cost, but is the computational cost of MCMC still proportional to the number of data points with these subsampling methods? 
 We have run experiments equivalent to those in section \ref{subsec:simple_log_reg}, but with different number of data points and a constant number of iterations. We performed the experiment with number of data points $N = \left\{100, 500, 1000, 5000\right\}$. All experiments were conducted with $20000$ iterations. 
 
 
-\subsection{Multiple logistic regression}\label{sec:experiments_multiple_log_reg}
+\section{Multiple logistic regression}\label{sec:experiments_multiple_log_reg}
 In addition to simple logistic regression, we did a multiple logistic regression, with nine explanatory variables in addition to a bias term. The explanatory variables  
 were simulated as follows
 \todo{notation}
@@ -581,7 +529,7 @@ The result for the number of likelihood evaluations for different $\theta^{\left
 \end{table} 
 With many parameters, there is a lot to plot, so here, we chose to only display the plots for 50 000 iterations, for  $\theta^{\left(0\right)} = \mathbf{0}$, $\theta^{\left(0\right)} = \mathbf{1}$ and $\theta^{\left(0\right)} = \theta$.   
 
-\subsubsection{$\theta^{\left(0\right)} = \mathbf{0}$}
+\subsection{$\theta^{\left(0\right)} = \mathbf{0}$}
 \begin{figure}%
     \centering
     \subfloat{
@@ -594,17 +542,7 @@ With many parameters, there is a lot to plot, so here, we chose to only display 
 \end{figure}
 
 
-\begin{figure}%
-    \centering
-    \subfloat{
-    \includegraphics[scale=0.4, page = 5]{figures/multiple_logistic_regression/50k_iterations/02_06_theta1.pdf}}%
-    \qquad
-    \subfloat{
-    \includegraphics[scale=0.4, page = 6]{figures/multiple_logistic_regression/50k_iterations/02_06_theta1.pdf}}%
-    \caption{Simulated values of the $\beta$'s through the iterations with a $20\%$ burn-in $\theta^{\left(0\right)} = \mathbf{0}$}%
-    \label{fig:chain_50k_02_06_theta1}%
-\end{figure}
-
+\
 \begin{figure}%
     \centering
     \subfloat{
@@ -616,7 +554,7 @@ With many parameters, there is a lot to plot, so here, we chose to only display 
     \label{fig:autocorrelation_50k_02_06_theta1}%
 \end{figure}
 
-\subsubsection{$\theta^{\left(0\right)} = \mathbf{1}$}
+\subsection{$\theta^{\left(0\right)} = \mathbf{1}$}
 
 \begin{figure}%
     \centering
@@ -632,17 +570,6 @@ With many parameters, there is a lot to plot, so here, we chose to only display 
 
 \begin{figure}%
     \centering
-    \subfloat{
-    \includegraphics[scale=0.4, page = 5]{figures/multiple_logistic_regression/50k_iterations/02_06_theta2.pdf}}%
-    \qquad
-    \subfloat{
-    \includegraphics[scale=0.4, page = 6]{figures/multiple_logistic_regression/50k_iterations/02_06_theta2.pdf}}%
-    \caption{Simulated values of the $\beta$'s through the iterations with a $20\%$ burn-in $\theta^{\left(0\right)} = \mathbf{1}$}%
-    \label{fig:chain_50k_02_06_theta2}%
-\end{figure}
-
-\begin{figure}%
-    \centering
     \subfloat{\includegraphics[scale=0.4, page = 11]{figures/multiple_logistic_regression/50k_iterations/02_06_theta2.pdf}}%
     \qquad
     \subfloat{\includegraphics[scale=0.4, page = 12]{figures/multiple_logistic_regression/50k_iterations/02_06_theta2.pdf}}%
@@ -650,7 +577,7 @@ With many parameters, there is a lot to plot, so here, we chose to only display 
     \label{fig:autocorrelation_50k_02_06_theta2}%
 \end{figure}
 
-\subsubsection{$\theta^{\left(0\right)} = \theta$}
+\subsection{$\theta^{\left(0\right)} = \theta$}
 
 \begin{figure}%
     \centering
@@ -664,16 +591,6 @@ With many parameters, there is a lot to plot, so here, we chose to only display 
 \end{figure}
 
 
-\begin{figure}%
-    \centering
-    \subfloat{
-    \includegraphics[scale=0.4, page = 5]{figures/multiple_logistic_regression/50k_iterations/02_06_theta3.pdf}}%
-    \qquad
-    \subfloat{
-    \includegraphics[scale=0.4, page = 6]{figures/multiple_logistic_regression/50k_iterations/02_06_theta3.pdf}}%
-    \caption{Simulated values of the $\beta$'s through the iterations with a $20\%$ burn-in $\theta^{\left(0\right)} = \theta$}%
-    \label{fig:chain_50k_02_06_theta3}%
-\end{figure}
 
 \begin{figure}%
     \centering
