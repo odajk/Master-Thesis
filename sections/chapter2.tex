@@ -10,13 +10,14 @@ For each data point $x_n$ Maclaurin and Adams introduce an auxiliary variable $z
 \begin{equation}
     B_n\left(\theta\right) \leq L_n\left(\theta\right)
 \end{equation} is met for all $\theta$ and all $n$. 
-The $z_n$'s are  Bernoulli distributed, conditioned on the parameters $x_n$ and $\theta$, 
-and drawn from the  Bernoulli distribution:
+They let the $z_n$'s be  Bernoulli distributed, conditioned on the parameters $x_n$ and $\theta$: 
 \begin{equation}\label{eq:auxiliary_dist}
     p(z_n\mid x_n,\theta) = \left[\frac{L_n(\theta) - B_n(\theta)}{L_n(\theta)}\right]^{z_n}\left[\frac{B_n(\theta)}{L_n(\theta)}\right]^{1-z_n} \quad .
 \end{equation}
-We say that a data point $x_n$ is bright if $z_n = 1$, and that it is dark if $z_n = 0$. 
-From \eqref{eq:auxiliary_dist}, we see that a data point $x_n$ is more likely to be dark if $L_n(\theta) - B_n(\theta)$ is small, i.e. the lower bound $B_n(\theta)$ is tight to the likelihood $L_n(\theta)$. Including these auxiliary variables, we get the following joint probability distribution. 
+They say that a data point $x_n$ is bright if $z_n = 1$, and that it is dark if $z_n = 0$. 
+From \eqref{eq:auxiliary_dist}, it is apparent a  that a data point $x_n$ is more likely to be dark if $L_n(\theta) - B_n(\theta)$ is small, i.e. the lower bound $B_n(\theta)$ is tight to the likelihood $L_n(\theta)$. 
+
+When the distribution of the the auxiliary variables is included in the model, they get the following joint probability distribution. 
 \begin{equation*}
 \begin{split}
      p(\theta, \{z_n\}_{n=1}^N\mid\{x_n\}_{n=1}^N) &\propto p(\theta, \{x_n, z_n\}_{n = 1}^N) \\
@@ -45,9 +46,9 @@ It is only necessary when that data point is bright, i.e. $z_n = 1$.
 If a data point is dark, they will not calculate its likelihood $L_n(\theta)$, but only the lower bound of its likelihood, $B_n(\theta)$. It is apparent that calculating the estimate of the posterior given in \eqref{eq:firefly} is less costly than calculating the true posterior, \textit{if} the  lower bound of the likelihood, $B_n\left(\theta\right)$ is cheap to compute. In particular, it is important that $\prod_{n=1}^N B_n\left(\theta\right)$ is cheap to compute, as $\prod_{n=1}^N B_n\left(\theta\right)$ has to be calculated regardless of the value of $z_n$. If $\prod_{n=1}
 ^N B_n\left(\theta\right)$ is not cheap to compute, the computational burden will only be shifted from calculating $\prod_{n=1}^N L_n\left(\theta\right)$ to calculating $\prod_{n=1}^N B_n\left(\theta\right)$.  
 As can be seen from (\ref{eq:auxiliary_dist}), the number of bright data points is dependent on the tightness of the lower bounds $B_n(\theta)$, the closer the lower bound $B_n\left(\theta\right)$ is to the true likelihood $L_n\left(\theta\right)$, the fewer bright data points there will be.  
-To limit the amount of time taken to evaluate the joint posterior, the number of bright data points should also be limited, since for each bright data point, both the lower bound $B_n\left(\theta\right)$, and the likelihood $L_n\left(\theta\right)$ has to be calculated.
+To limit the computational cost of the joint posterior, the number of bright data points should also be small, as for each bright data point, both the lower bound $B_n\left(\theta\right)$, and the likelihood $L_n\left(\theta\right)$ has to be calculated. 
 
-Choosing a $B_n\left(\theta\right)$ that is sufficiently tight to $L_n\left(\theta\right)$ and has a cheap to compute product $\prod_{n=1}^N B_n\left(\theta\right)$, is problem dependent. A bound that may suit many models is the one used in \cite{Bardenet:1}, where the bound is a second degree Taylor  expansion of the likelihood. Using the Taylor-Lagrange inequality, the difference between the likelihood and the Taylor expansion can be bounded, and thus we can create the lower bound $B_n\left(\theta\right)$. We will give a recipe of creating such a bound in chapter \ref{taylor_bound_intro}.    
+Choosing a $B_n\left(\theta\right)$ that is sufficiently tight to $L_n\left(\theta\right)$ and has a cheap to compute product $\prod_{n=1}^N B_n\left(\theta\right)$, is problem dependent. A bound that may suit many models is second degree Taylor  expansion of the likelihood used in \cite{Bardenet:1}. With the the Taylor-Lagrange inequality, the difference between the likelihood and the Taylor expansion can be bounded, and thus we can create the lower bound $B_n\left(\theta\right)$. We will give a recipe of creating such a bound in chapter \ref{taylor_bound_intro}.    
 
 
 \begin{algorithm}[H]
@@ -151,8 +152,8 @@ with $\theta = \left(\mu, \sigma\right)$ and $R_2(\mu, \sigma)$ the remainder fo
 Then, in order to apply \eqref{eq:taylor_lagr_multivar}, we have to calculate the maximal third derivative of the log likelihood.
 For the Gaussian distribution, we get this when $\sigma$ is minimal and $x_n - \mu$ is maximal.
 In both the Firefly algorithm Section \ref{sec:Firefly}) and Bardenet et al.'s confidence sampler Section \ref{sec:conf_sampler}), the Taylor approximation of the likelihood has to be calculated for each iteration in the Markov chain, to approximate the likelihood of the new $\theta'$. 
-In that iteration, the minimum possible value of $\sigma$ is $\sigma_{min} = \min\left(\sigma_{MAP}, \sigma', \sigma^{(i-1)}\right) $ where $\sigma'$ is the proposed new $\sigma$-value, $\sigma^{(i-1)}$ is the $\sigma$-value of the previous iteration, and $\sigma_{MAP}$ is the maximum aposteriori estimate. 
-The maximal deviation of the data from the mean value, $\mu$, at iteration $i$ is given by $X_{max} = \max_{n\in 1,\ldots, N} \left(\mid x_n - \mu'\mid, \mid x_n - \mu^{(i-1)}\mid, \mid x_n - \mu_{MAP}\mid\right)$, where $\mu'$ is the proposed value $\mu$ at iteration $i$, $\mu^{(i-1)}$ is the $\mu$-value at the previous iteration, and $\mu_{MAP}$ is the maximum aposteriori estimate of $\mu$. 
+In that iteration, the minimum possible value of $\sigma$ is $\sigma_{min} = \min\left(\sigma_{\star}, \sigma', \sigma^{(i-1)}\right) $ where $\sigma'$ is the proposed new $\sigma$-value, $\sigma^{(i-1)}$ is the $\sigma$-value of the previous iteration, and $\sigma_{\star}$ is the the point of which we Taylor expand about. 
+The maximal deviation of the data from the mean value, $\mu$, at iteration $i$ is given by $X_{max} = \max_{n\in 1,\ldots, N} \left(\mid x_n - \mu'\mid, \mid x_n - \mu^{(i-1)}\mid, \mid x_n - \mu_{\star}\mid\right)$, where $\mu'$ is the proposed value $\mu$ at iteration $i$, $\mu^{(i-1)}$ is the $\mu$-value at the previous iteration, and $\mu_{\star}$ is the point of which is Taylor expanded about.  
 \subsection{Lower bound for logistic model}
 The logistic regression model has the following likelihood 
 \begin{equation}\label{eq:log_reg}
@@ -270,6 +271,7 @@ Combining \eqref{eq:logist_taylor} and \eqref{eq:error_bound_taylor}, we can cre
     \end{split}
 \end{equation*}
 
+
 \todo{Relate to algos}
 \section{Bardenet et. al's adaptive subsampler (2014)}\label{sec:conf_sampler}
 \todo{Har dette noe med Delayed Rejection å gjøre?}
@@ -278,9 +280,9 @@ To reduce this cost, they take advantage of concentration inequalities in combin
 First, they rewrite the accept-reject step in, Algorithm \ref{algo:MH}  (line 8)  
 \begin{equation}\label{eq:some_use?}
 \begin{split}
-    u < \frac{\pi\left(\theta'\right)q\left(\theta\mid \theta'\right)}{\pi \left(\theta\right)q\left(\theta'\mid \theta\right)} &= \frac{p\left(x_1, \ldots x_N \mid \theta'\right) p\left(\theta'\right)q\left(\theta\mid \theta'\right)}{p\left(x_1, \ldots x_N\mid \theta\right)p\left(\theta\right)q\left(\theta'\mid\theta\right)} \\ 
-    \implies \frac{u q\left(\theta'\mid \theta \right)p\left(\theta\right)}{q\left(\theta\mid\theta'\right)p\left(\theta'\right)} &< \frac{p\left(x_1, \ldots, x_N \mid \theta'\right)}{p\left(x_1, \ldots, x_N \mid \theta\right)} \\
-    \implies \frac{u q\left(\theta'\mid \theta \right) p\left(\theta\right)}{q\left(\theta \mid \theta'\right) p \left(\theta'\right)} &< \frac{\prod_{n = 1}^N p\left(x_n\mid \theta'\right)}{\prod_{n = 1}^N p\left(x_n \mid \theta\right)}
+    u < \frac{p\left(\theta'\mid \mathbf{x}\right)g\left(\theta\mid \theta'\right)}{p \left(\theta\mid\mathbf{x}\right)g\left(\theta'\mid \theta\right)} &= \frac{p\left(x_1, \ldots x_N \mid \theta'\right) p\left(\theta'\right)g\left(\theta\mid \theta'\right)}{p\left(x_1, \ldots x_N\mid \theta\right)p\left(\theta\right)g\left(\theta'\mid\theta\right)} \\ 
+    \implies \frac{u g\left(\theta'\mid \theta \right)p\left(\theta\right)}{g\left(\theta\mid\theta'\right)p\left(\theta'\right)} &< \frac{p\left(x_1, \ldots, x_N \mid \theta'\right)}{p\left(x_1, \ldots, x_N \mid \theta\right)} \\
+    \implies \frac{u g\left(\theta'\mid \theta \right) p\left(\theta\right)}{g\left(\theta \mid \theta'\right) p \left(\theta'\right)} &< \frac{\prod_{n = 1}^N p\left(x_n\mid \theta'\right)}{\prod_{n = 1}^N p\left(x_n \mid \theta\right)}
     \end{split}
 \end{equation}
 Next, they take the logarithm on both sides of \ref{eq:some_use?}, and divide by $N$ and get
@@ -300,8 +302,8 @@ Where $\psi\left(u, \theta, \theta'\right)\coloneqq \frac{1}{N}\log\left[\frac{u
         \State $\theta = \theta^{\left(i-1\right)}$ 
         \State$\theta' \sim \theta + \eta$ where $\eta\sim g\left(\cdot \mid \theta\right)$
         \State $u\sim \textsc{Uniform}\left(0,1\right)$
-        \State $\psi\left(u, \theta, \theta'\right) = \frac{1}{n} \log\left[\frac{u q\left(\theta'\mid \theta \right) p \left(\theta\right)}{q\left(\theta \mid \theta_k \right)p\left(\theta'\right)} \right]$
-        \State $\Lambda_N \left(\theta, \theta'\right) = \frac{1}{n} \sum_{k = 1}^n \log \left[\frac{p\left(x_{k}\mid \theta'\right)}{p\left(x_{k}\mid \theta\right)}\right]$
+        \State $\psi\left(u, \theta, \theta'\right) = \frac{1}{n} \log\left[\frac{u g\left(\theta \mid \theta' \right) p \left(\theta\right)}{g\left(\theta' \mid \theta \right)p\left(\theta'\right)} \right]$
+        \State $\Lambda_N \left(\theta, \theta'\right) = \frac{1}{N} \sum_{n = 1}^N \log \left[\frac{p\left(x_{n}\mid \theta'\right)}{p\left(x_{n}\mid \theta\right)}\right]$
         \If{$\Lambda_N\left(\theta, \theta'\right) > \psi \left(u, \theta, \theta'\right)$}
         \State $\theta^{\left(i\right)} = \theta'$
         \Else 
@@ -310,8 +312,8 @@ Where $\psi\left(u, \theta, \theta'\right)\coloneqq \frac{1}{N}\log\left[\frac{u
          \EndFor
     \end{algorithmic}
 \end{algorithm}
-The reason for rewriting Algorithm \ref{algo:MH} to the form of Algorithm \ref{algo:MH_rewritten} is that \cite{Bardenet:2} want to use only a subset of the data to make a Monte Carlo estimate of $\Lambda_N\left(\theta^{\left(k\right)}, \theta'\right)$. 
-i.e. if $X$ is the whole data set, and $X^{\star}$ is a subset of the data set of size $t\leq n$, drawn with uniform probability and without replacement, $\Lambda^{\star}_t = \frac{1}{t} \sum_{i = 1}^t \log\left[\frac{p\left(x_i^{\star}\mid \theta'\right)}{p\left(x_i^{\star}\mid \theta^{\left(k\right)}\right)}\right]$ is an estimate of $\Lambda_N$.  Then, they use concentration inequalities to find a measure of the precision of the Monte Carlo estimate $\Lambda_t^{\star}$ relative to the true value,  $\Lambda_N$.
+The reason for rewriting Algorithm \ref{algo:MH} to the form of Algorithm \ref{algo:MH_rewritten} is that \cite{Bardenet:2} want to use only a subset of the data to make a Monte Carlo estimate of $\Lambda_N\left(\theta, \theta'\right)$. 
+i.e. if $\mathbf{x}$ is the whole data set, and $\mathbf{x}^{\star}$ is a subset of the data set of size $t\leq N$, drawn with uniform probability and without replacement, $\Lambda^{\star}_t = \frac{1}{t} \sum_{n = 1}^t \log\left[\frac{p\left(x_n^{\star}\mid \theta'\right)}{p\left(x_n^{\star}\mid \theta\right)}\right]$ is an estimate of $\Lambda_N$.  Then, they use concentration inequalities to find a measure of the precision of the Monte Carlo estimate $\Lambda_t^{\star}$ relative to the true value,  $\Lambda_N$.
 A concentration inequality used in the confidence sampler, with concentration bound $c_t$ is on the form
 \begin{equation}\label{eq:concentration}
 \begin{split}
@@ -341,12 +343,13 @@ where $\kappa = \frac{7}{3} + \frac{3}{\sqrt{2}}$, $\delta$ is equivalent to the
     \caption{Confidence Sampler}
     \label{algo:conf_sampl}
     \begin{algorithmic}[1] % The number tells where the line numbering should start
-    \Function{ConfidenceSampler}{$p\left(x\mid \theta \right), p\left(\theta\right), q\left(\theta'\mid \theta\right), \theta_0, N_{iter}, \chi, \left(\delta_t\right), C_{\theta, \theta'}$}
+   % \Function{ConfidenceSampler}{$p\left(x\mid \theta \right), p\left(\theta\right), q\left(\theta'\mid \theta\right), \theta_0, N_{iter}, \chi, \left(\delta_t\right), C_{\theta, \theta'}$}
+   \State $\theta^{\left(0\right)} \sim \textsc{InitialDist}$
        \For {$i \gets 1 \ldots N_{iter}$}
        \State $\theta = \theta^{\left(i-1\right)}$
-       \State $\theta' \sim q\left(\cdot|\theta\right)$
+       \State $\theta' \sim g\left(\cdot|\theta\right)$
        \State $u \sim \mathcal{U}\left(0,1\right)$
-       \State$\psi\left(u, \theta, \theta'\right) = \frac{1}{N}\log\left[u\frac{p\left(\theta\right)q\left(\theta'\mid \theta\right)}{p\left(\theta'\right)q\left(\theta \mid\theta'\right)}\right]$
+       \State$\psi\left(u, \theta, \theta'\right) = \frac{1}{N}\log\left[u\frac{p\left(\theta\right)g\left(\theta\mid \theta'\right)}{p\left(\theta'\right)g\left(\theta' \mid\theta\right)}\right]$
        \State $t = 0$
        \State $t_{look} = 0$
        \State $\Lambda^{\star} = 0$
@@ -371,8 +374,8 @@ where $\kappa = \frac{7}{3} + \frac{3}{\sqrt{2}}$, $\delta$ is equivalent to the
        \State{$\theta^{\left(i\right)} = \theta$}
        \EndIf
        \EndFor
-       \State \Return $\left(\theta^{\left(i\right)}\right)_{i = 1, \ldots, N_{iter}}$
-       \EndFunction
+       %\State \Return %$\left(\theta^{\left(i\right)}\right)_{i = 1, \ldots, N_{iter}}$
+       %\EndFunction
     \end{algorithmic}
 \end{algorithm}
 We note that we need to be able to calculate $a$ and $b$ without actually evaluating all likelihoods for the confidence sampler give a reduction in the number of likelihood evaluations. In the following sections, we will check that this is possible for the normal model, logistic regression and linear regression. 
@@ -614,4 +617,11 @@ Then, the algorithm for the improved confidence sampler with proxies, is very si
 \end{itemize}
 
 
+\subsection{Dynamic update of $\theta_{\star}$ of the lower bound}
+\cite{Bardenet:1} suggest a dynamic update of proxies after every $\alpha$ iteration of the MCMC for their confidence sampler with proxy. The proxies are updated by changing the $\theta_{\star}$ to the $\theta$ at that iteration, and recalculate the proxies with this new $\theta_{\star}$. The iterations where the proxies are updated will be more computationally costly, but the goal is to reduce the computational cost of the other iterations.
 
+
+This dynamic update of $\theta_{\star}$ may also be applied to the Firefly Monte Carlo. 
+ With a Taylor lower bound for the likelihoods, a dynamic update of $\theta_{\star)$ 
+
+In addition to the suggestion of \cite{Bardenet:1}, we will also update $\theta_{\star}$ to the current Monte Carlo estimate of $\theta$. This may make convergence slower, but lower the variation of the chain compared to updating $\theta_{\star}$ to the $\theta$ of that iteration.  

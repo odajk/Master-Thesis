@@ -196,7 +196,7 @@ This is done by dividing the data in batches, and  \todo{fulfør setning}
 \section{The Metropolis-Hastings algorithm}\label{subsec:mh}
 The MH algorithm is a very general algorithm and one of the most popular algorithms for MCMC. 
 The algorithm for MH is given below.
-\begin{algorithm}[H]\label{algo:MH}
+\begin{algorithm}[H]
     \caption{Metropolis-Hastings}
     \label{algo:MH}
     \begin{algorithmic}[1] % The number tells where the line numbering should start\
@@ -205,7 +205,7 @@ The algorithm for MH is given below.
         \State $\theta = \theta^{\left(i - 1\right)}$
         \State$\theta' \sim g\left(\cdot \mid \theta\right)$
         \State $u\sim \textsc{Uniform}\left(0,1\right)$
-        \If{ $\frac{p\left(\theta' \mid \mathbf{x}\right) g\left(\theta \mid \theta'\right)}{p\left(\theta\mid \mathbf{x}\right)g\left(\theta'\mid \theta\right)} > u$}
+        \If{ $\frac{p\left(\theta' \mid \mathbf{x}\right) g\left(\theta \mid \theta'\right)}{p\left(\theta\mid \mathbf{x}\right)g\left(\theta'\mid \theta\right)} > u$} \label{state:accept_reject_MH}
         \State $\theta^{\left(i\right)} = \theta'$
         \Else 
         \State $\theta^{\left(i\right)} = \theta$
